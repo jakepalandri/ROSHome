@@ -1,0 +1,22 @@
+running egg_info
+writing ../../build/kinect_ascii/kinect_ascii.egg-info/PKG-INFO
+writing dependency_links to ../../build/kinect_ascii/kinect_ascii.egg-info/dependency_links.txt
+writing entry points to ../../build/kinect_ascii/kinect_ascii.egg-info/entry_points.txt
+writing requirements to ../../build/kinect_ascii/kinect_ascii.egg-info/requires.txt
+writing top-level names to ../../build/kinect_ascii/kinect_ascii.egg-info/top_level.txt
+reading manifest file '../../build/kinect_ascii/kinect_ascii.egg-info/SOURCES.txt'
+writing manifest file '../../build/kinect_ascii/kinect_ascii.egg-info/SOURCES.txt'
+running build
+running build_py
+copying kinect_ascii/kinect_ascii.py -> /home/jake/ROSHome/ros2_ws/build/kinect_ascii/build/lib/kinect_ascii
+running install
+running install_lib
+copying /home/jake/ROSHome/ros2_ws/build/kinect_ascii/build/lib/kinect_ascii/kinect_ascii.py -> /home/jake/ROSHome/ros2_ws/install/kinect_ascii/lib/python3.8/site-packages/kinect_ascii
+byte-compiling /home/jake/ROSHome/ros2_ws/install/kinect_ascii/lib/python3.8/site-packages/kinect_ascii/kinect_ascii.py to kinect_ascii.cpython-38.pyc
+running install_data
+running install_egg_info
+removing '/home/jake/ROSHome/ros2_ws/install/kinect_ascii/lib/python3.8/site-packages/kinect_ascii-0.0.0-py3.8.egg-info' (and everything under it)
+Copying ../../build/kinect_ascii/kinect_ascii.egg-info to /home/jake/ROSHome/ros2_ws/install/kinect_ascii/lib/python3.8/site-packages/kinect_ascii-0.0.0-py3.8.egg-info
+running install_scripts
+Installing listener script to /home/jake/ROSHome/ros2_ws/install/kinect_ascii/lib/kinect_ascii
+writing list of installed files to '/home/jake/ROSHome/ros2_ws/build/kinect_ascii/install.log'
