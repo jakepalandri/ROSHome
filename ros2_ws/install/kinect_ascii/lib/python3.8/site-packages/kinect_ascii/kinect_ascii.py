@@ -45,8 +45,22 @@ class ReadKinectDepth(Node):
                 row.append(paired_data[i + j])
             data.append(row)
         
-        # width must be divisible by divisions x and
-        # height must be divisible by divisions y
+        # # width must be divisible by divisions x and
+        # # height must be divisible by divisions y
+        # divisions_x = 2
+        # divisions_y = 4
+        # compressed_data = []
+        # for y in range(0, len(data), divisions_y):
+        #     row = []
+        #     for x in range(0, len(data[y]), divisions_x):
+        #         sum = 0
+        #         for i in range(divisions_y):
+        #             for j in range(divisions_x):
+        #                 sum += data[y + i][x + j]
+        #         row.append(sum)
+        #     compressed_data.append(row)
+
+        # potentially better method?
         divisions_x = 2
         divisions_y = 4
         compressed_data = []
@@ -56,7 +70,9 @@ class ReadKinectDepth(Node):
                 sum = 0
                 for i in range(divisions_y):
                     for j in range(divisions_x):
-                        sum += data[y + i][x + j]
+                        for k in range(int(msg.step / msg.width)):
+                            # take the 1st 8 bits, 2nd 8 bits, etc and take their averages
+                            sum += int((data[y + i][x + j] >> 8 * k) & 0b11111111) << 8 * k
                 row.append(sum)
             compressed_data.append(row)
         
