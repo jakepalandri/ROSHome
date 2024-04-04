@@ -22,34 +22,27 @@ catkin_make
 source devel/setup.bash
 echo "alias srk='source ~/catkin_ws/devel/setup.bash'" >> ~/.bashrc
 
-# CUDA INSTALLATION - DO I NEED?????????
-# cd ~
-# sudo apt-get install linux-headers-$(uname -r)
-# sudo apt-key del 7fa2af80
+# CUDA INSTALLATION
+cd ~
+sudo apt-get install linux-headers-$(uname -r)
+sudo apt-key del 7fa2af80
 
-# wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.1-1_all.deb
-# sudo dpkg -i cuda-keyring_1.1-1_all.deb
-# sudo apt-get update
-# sudo apt-get -y install cuda-toolkit-12-4
-# sudo apt-get -y install cuda-toolkit
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+sudo apt-get update
+sudo apt-get -y install cuda
 
 # sudo apt-get -y install nvidia-gds
 
-# sudo apt-get -y install nvidia-kernel-common-550
-# sudo apt-get -y install nvidia-dkms-550
-# sudo apt-get -y install nvidia-dkms-550-open
-# sudo apt-get -y install libnvidia-common-550
-# sudo apt-get -y install libnvidia-compute-550
-# sudo apt-get -y install libnvidia-gl-550
-# sudo apt-get -y install libnvidia-extra-550
-# sudo apt-get -y install nvidia-driver-550
-# sudo apt-get -y install cuda-drivers-550
+sudo apt-get install -y nvidia-driver-550-open
+sudo apt-get install -y cuda-drivers-550
 
-# sudo apt-get install -y cuda-drivers
-# sudo apt-get install -y nvidia-driver-550-open
-# sudo apt-get install -y cuda-drivers-550
+echo "export LD_LIBRARY_PATH='/usr/local/cuda/lib64:${LD_LIBRARY_PATH}'" >> ~/.bashrc
+echo "export PATH='/usr/local/cuda/bin:${PATH}'" >> ~/.bashrc
 
-# sudo reboot
+sudo reboot # disable secure boot
+
+nvidia-smi
 
 # LIBFREENECT2 INSTALLATION WITH CHANGE IN CMAKE FOR KINECT2 BRIDGE
 cd ~
@@ -59,14 +52,14 @@ cd libfreenect2
 
 sudo apt-get -y install build-essential cmake pkg-config
 sudo apt-get -y install libusb-1.0-0-dev
-sudo apt-get -y install libturbojpeg0-dev
+sudo apt-get -y install libturbojpeg0-dev # skip?
 sudo apt-get -y install libglfw3-dev
 sudo apt-get -y install beignet-dev
-sudo apt-get -y install libva-dev libjpeg-dev
+sudo apt-get -y install libva-dev libjpeg-dev # do instead?
 sudo apt-get -y install libopenni2-dev
 
 mkdir build && cd build
-cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/freenect2 -DENABLE_CXX11=ON -DENABLE_CUDA=OFF
+cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/freenect2 -DENABLE_CXX11=ON -DENABLE_CUDA=ON
 make
 make install
 
@@ -94,6 +87,10 @@ rosdep install -r --from-paths .
 cd ~/catkin_ws
 sudo bash -c 'echo -e "set( CMAKE_CXX_STANDARD 14)\n$(cat src/CMakeLists.txt)" > src/CMakeLists.txt'
 catkin_make -DCMAKE_BUILD_TYPE="Release"
+
+sudo apt-get install nvidia-modprobe opencl-headers
+echo "/usr/local/cuda/lib64" | sudo tee /etc/ld.so.conf.d/cuda.conf
+sudo ldconfig
 
 # ROS2 INSTALLATION
 locale  # check for UTF-8

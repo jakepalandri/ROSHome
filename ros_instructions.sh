@@ -15,11 +15,12 @@ export ROS_MASTER_URI=http://localhost:11311
 ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
 
 # TERMINAL 4:
-source /opt/ros/noetic/setup.bash
+sr1
 # ROS1 PROGRAMS
-rviz # Set "Fixed Frame" to kinect2_link in Global Options
+rviz # Open the kinect.rviz config file
 
 # TERMINAL 4:
-source /opt/ros/foxy/setup.bash
+sr2
 # ROS2 PROGRAMS
-
+source ~/rviz2_ws/src/install/setup.bash
+rviz2 # Open the kinect2.rviz config file
