@@ -1,0 +1,16 @@
+topics:
+  -
+    topic: /kinect2/sd/camera_info
+    type: sensor_msgs/msg/CameraInfo
+    queue_size: 1
+  -
+    topic: /kinect2/sd/image_color_rect
+    type: sensor_msgs/msg/Image
+    queue_size: 1
+  -
+    topic: /kinect2/sd/image_depth
+    type: sensor_msgs/msg/Image
+    queue_size: 1
+
+bridge_all_2to1_topics: false
+bridge_all_1to2_topics: false
