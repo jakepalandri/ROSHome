@@ -45,15 +45,18 @@ class ReadKinectDepth(Node):
                 row.append(paired_data[i + j])
             data.append(row)
         
+        # width must be divisible by divisions x and
+        # height must be divisible by divisions y
+        divisions_x = 2
+        divisions_y = 4
         compressed_data = []
-        for y in range(0, len(data), 4):
+        for y in range(0, len(data), divisions_y):
             row = []
-            for x in range(0, len(data[y]), 4):
+            for x in range(0, len(data[y]), divisions_x):
                 sum = 0
-                sum += data[y    ][x] + data[y    ][x + 1] + data[y    ][x + 2] + data[y    ][x + 3]
-                sum += data[y + 1][x] + data[y + 1][x + 1] + data[y + 1][x + 2] + data[y + 1][x + 3]
-                sum += data[y + 2][x] + data[y + 2][x + 1] + data[y + 2][x + 2] + data[y + 2][x + 3]
-                sum += data[y + 3][x] + data[y + 3][x + 1] + data[y + 3][x + 2] + data[y + 3][x + 3]
+                for i in range(divisions_y):
+                    for j in range(divisions_x):
+                        sum += data[y + i][x + j]
                 row.append(sum)
             compressed_data.append(row)
         
