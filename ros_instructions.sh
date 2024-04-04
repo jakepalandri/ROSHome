@@ -12,7 +12,8 @@ sr1
 sr2
 srk
 export ROS_MASTER_URI=http://localhost:11311
-ros2 run ros1_bridge dynamic_bridge --bridge-all-topics
+rosparam load ROSHome/bridge.yaml
+ros2 run ros1_bridge parameter_bridge
 
 # TERMINAL 4:
 sr1
@@ -22,5 +23,7 @@ rviz # Open the kinect.rviz config file
 # TERMINAL 4:
 sr2
 # ROS2 PROGRAMS
-source ~/rviz2_ws/src/install/setup.bash
 rviz2 # Open the kinect2.rviz config file
+source ~/rviz2_ws/src/install/setup.bash
+ros2 run kinect_ascii listener # ros2 run package executable_name
+
