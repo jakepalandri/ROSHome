@@ -88,14 +88,14 @@ class ReadKinectDepth(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_subscriber = ReadKinectDepth()
+    read_kinect_depth = ReadKinectDepth()
 
-    rclpy.spin(minimal_subscriber)
+    rclpy.spin(read_kinect_depth)
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    minimal_subscriber.destroy_node()
+    read_kinect_depth.destroy_node()
     rclpy.shutdown()
 
 

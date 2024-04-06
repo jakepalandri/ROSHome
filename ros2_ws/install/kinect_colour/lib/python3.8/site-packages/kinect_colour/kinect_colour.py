@@ -63,14 +63,14 @@ class ReadKinectColour(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_subscriber = ReadKinectColour()
+    read_kinect_colour = ReadKinectColour()
 
-    rclpy.spin(minimal_subscriber)
+    rclpy.spin(read_kinect_colour)
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    minimal_subscriber.destroy_node()
+    read_kinect_colour.destroy_node()
     rclpy.shutdown()
 
 

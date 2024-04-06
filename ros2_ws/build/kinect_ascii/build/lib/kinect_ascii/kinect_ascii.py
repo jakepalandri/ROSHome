@@ -44,23 +44,9 @@ class ReadKinectDepth(Node):
             for j in range(msg.width):
                 row.append(paired_data[i + j])
             data.append(row)
-        
-        # # width must be divisible by divisions x and
-        # # height must be divisible by divisions y
-        # divisions_x = 2
-        # divisions_y = 4
-        # compressed_data = []
-        # for y in range(0, len(data), divisions_y):
-        #     row = []
-        #     for x in range(0, len(data[y]), divisions_x):
-        #         sum = 0
-        #         for i in range(divisions_y):
-        #             for j in range(divisions_x):
-        #                 sum += data[y + i][x + j]
-        #         row.append(sum)
-        #     compressed_data.append(row)
 
-        # potentially better method?
+        # width must be divisible by divisions x and
+        # height must be divisible by divisions y
         divisions_x = 2
         divisions_y = 4
         compressed_data = []
@@ -71,7 +57,8 @@ class ReadKinectDepth(Node):
                 for i in range(divisions_y):
                     for j in range(divisions_x):
                         for k in range(int(msg.step / msg.width)):
-                            # take the 1st 8 bits, 2nd 8 bits, etc and take their averages
+                            # take the 1st 8 bits, 2nd 8 bits, etc and take their sums individually
+                            # could take averages but for some reason giving less precise data
                             sum += int((data[y + i][x + j] >> 8 * k) & 0b11111111) << 8 * k
                 row.append(sum)
             compressed_data.append(row)
@@ -101,14 +88,14 @@ class ReadKinectDepth(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    minimal_subscriber = ReadKinectDepth()
+    read_kinect_depth = ReadKinectDepth()
 
-    rclpy.spin(minimal_subscriber)
+    rclpy.spin(read_kinect_depth)
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    minimal_subscriber.destroy_node()
+    read_kinect_depth.destroy_node()
     rclpy.shutdown()
 
 
