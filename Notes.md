@@ -1,4 +1,34 @@
 # First meeting with Claude
+Yolo v7/v8
+Sony TV control
+Kinect for windows
+- Multiple?
+    - Interfering?
+    - Different frequencies
+Voice control
+- Already in yolo
+Predictive control using cameras
+- Machine Learning
+Paddington campus lab?
+Control devices with Raspberry Pis
+ROS Bridge
+Translate Kinect to Robot Maps
+SLAM - Simultaneous Localisation and Mapping
+
+Literature
+- Smart Environment
+- Robotics
+- Person tracking
+- 3D tracking
+- Behaviour monitoring
+- ROS
+- Theory and principles behind it
+- Not description
+
+For thesis C
+For aims in Thesis A
+How can you evaluate your goals?
+How did the literature evaluate themselves?
 
 # Meeting with Claude regarding the presentation
 Define the problem
