@@ -1,4 +1,4 @@
-# Lit Review
+# Lit Review (12-15 pages)
 
 ## Brief background (2 pages)
 - history
@@ -27,9 +27,9 @@ summary of what you aim to do and investigate
 ## Aims and outcomes (1 page)
 check canva or notes
 
-# Project Plan
+# Project Plan (5-7 pages)
 
-## Methodology and approach
+## Methodology and approach (3 pages)
 - Decompose the whole project into multiple components
 - Explain the functions of each component and how you would tackle each component
     - Tech stack slide?
@@ -38,21 +38,21 @@ check canva or notes
             - Later is what I acutally achieved in Thesis A
     - Some of this info is on timeline slide (Canva)
 
-## Timeline for Thesis B and C
+## Timeline for Thesis B and C (1 page)
 - In terms of weeks is enough detail
     - This will highly likely change over time
 - Justification of time allocation for each component
 
-## Required training and upskilling identified
+## Required training and upskilling identified (2 pages)
 - What will I have to learn for the ENTIRE project
     - ROS
     - Yolo
     - AI and Machine Learning
     - etc
 
-# Project Dependent Preparations
+# Project Dependent Preparations (1-2 pages)
 
-## Can the student achieve the aims in the timeline for Thesis B and Thesis C? What progress has been made already?
+## Can the student achieve the aims in the timeline for Thesis B and Thesis C? What progress has been made already? (1 Page)
 - Progress
 - Roadblocks
 - Tech Stack
@@ -60,11 +60,11 @@ check canva or notes
 - Explaining how demo and tests prove viability of project
     - Able to take 3D camera input and control devices
 
-## Project specific, but may include
-- Evidence of some upskilling (new programming languages, software, tools, project-specific knowledge required before taking Thesis Ba)
-- Preliminary results 
+- Project specific, but may include
+    - Evidence of some upskilling (new programming languages, software, tools, project-specific knowledge required before taking Thesis Ba)
+    - Preliminary results 
 
-# Document Presentation
+## Document Presentation (1 Page)
 - Report structure and layout
 - English skills – spelling, grammar
 - Figures
