@@ -1,13 +1,13 @@
 # Lit Review (12-15 pages)
 
-## Brief background (2 pages)
+## Brief background (2 pages) - Wednesday
 - history
 - contextualise importance
     - revolutionises daily living, will set new standards for accessibility
     - free up time (ask chatgpt for a list of benefits/how can smart home technologies revolutionise) 
     - if going through history, ensure that it is in reference to the importance of the smarthome, or parallels in significance
 
-## Summary of existing literature (8 pages)
+## Summary of existing literature (8 pages) - Half Wednesday / Half Thursday
 - Smart Environment
 - Robotics
 - Person tracking
@@ -16,20 +16,20 @@
 - ROS - outline and relevance
 - Theory and principles behind it, not description
 
-## Literature gaps (3 pages)
+## Literature gaps (3 pages) - Half Wednesday / Half Thursday
 lack of computer vision used in homes and home automation
 using AI for people tracking, gesture recogniction and behavioural predictive automation - lack of proper foundational knowledge, further innovate
 
-## Problem statement (1 page)
+## Problem statement (1 page) - Friday
 based on literature gaps
 summary of what you aim to do and investigate
 
-## Aims and outcomes (1 page)
+## Aims and outcomes (1 page) - Friday
 check canva or notes
 
 # Project Plan (5-7 pages)
 
-## Methodology and approach (3 pages)
+## Methodology and approach (3 pages) - Friday
 - Decompose the whole project into multiple components
 - Explain the functions of each component and how you would tackle each component
     - Tech stack slide?
@@ -38,12 +38,12 @@ check canva or notes
             - Later is what I acutally achieved in Thesis A
     - Some of this info is on timeline slide (Canva)
 
-## Timeline for Thesis B and C (1 page)
+## Timeline for Thesis B and C (1 page) - Saturday
 - In terms of weeks is enough detail
     - This will highly likely change over time
 - Justification of time allocation for each component
 
-## Required training and upskilling identified (2 pages)
+## Required training and upskilling identified (2 pages) - Saturday
 - What will I have to learn for the ENTIRE project
     - ROS
     - Yolo
@@ -52,7 +52,7 @@ check canva or notes
 
 # Project Dependent Preparations (1-2 pages)
 
-## Can the student achieve the aims in the timeline for Thesis B and Thesis C? What progress has been made already? (1 Page)
+## Can the student achieve the aims in the timeline for Thesis B and Thesis C? What progress has been made already? (1 Page) - Saturday
 - Progress
 - Roadblocks
 - Tech Stack
@@ -64,7 +64,7 @@ check canva or notes
     - Evidence of some upskilling (new programming languages, software, tools, project-specific knowledge required before taking Thesis Ba)
     - Preliminary results 
 
-## Document Presentation (1 Page)
+## Document Presentation (1 Page) - Saturday
 - Report structure and layout
 - English skills – spelling, grammar
 - Figures
