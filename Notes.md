@@ -257,4 +257,4 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
     - Many devices require an internet connection to operate
     - Computation and automation running should all be done locally to solve this
 - Automation and routine failure
-    - Devices 
+    - Devices
