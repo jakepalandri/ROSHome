@@ -1,3 +1,12 @@
 kinect_cal_data/*.png
 *.log
 unswthesis-2.1/*.gz
+unswthesis-2.1/*.aux
+unswthesis-2.1/*.bbl
+unswthesis-2.1/*.blg
+unswthesis-2.1/*.fdb_latexmk
+unswthesis-2.1/*.fls
+unswthesis-2.1/*.lof
+unswthesis-2.1/*.log
+unswthesis-2.1/*.lot
+unswthesis-2.1/*.toc

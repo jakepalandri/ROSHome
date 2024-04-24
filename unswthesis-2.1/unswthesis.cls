@@ -63,11 +63,11 @@
 % simply use \thesisfaculty{xxx} and \thesisschool{xxx}.
 
 \gdef\ThesisFacultyName{Faculty of Engineering}
-\gdef\ThesisSchoolName{Name of School}
+\gdef\ThesisSchoolName{School of Computer Science and Engineering}
 
 % Customise for foreign languages.
 
-\def\supervisorname{Supervisor}
+\def\supervisorname{Claude Sammut}
 \def\abstractname{Abstract}
 \def\declarationname{Originality Statement}
 
@@ -230,10 +230,10 @@
 \newcommand{\ThesisOtherNames}[1]{\gdef\ThesisOtherNamesString{#1}}
 \newcommand{\ThesisAbbreviatedDegree}[1]{\gdef\ThesisAbbreviatedDegreeString{#1}}
 
-\ThesisFamilyName{*not*set*}
-\ThesisGivenName{*not*set*}
-\ThesisOtherNames{*not*set*} %if any
-\ThesisAbbreviatedDegree{*not*set*}
+\ThesisFamilyName{Palandri}
+\ThesisGivenName{Jake}
+\ThesisOtherNames{David} %if any
+\ThesisAbbreviatedDegree{BE Software Engineering}
 
 \usepackage{collect}
 \definecollection{@bstract}
