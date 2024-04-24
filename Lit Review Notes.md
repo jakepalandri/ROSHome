@@ -64,7 +64,7 @@ check canva or notes
     - Evidence of some upskilling (new programming languages, software, tools, project-specific knowledge required before taking Thesis Ba)
     - Preliminary results 
 
-## Document Presentation (1 Page) - Saturday
+# Document Presentation (1 Page) - Saturday
 - Report structure and layout
 - English skills – spelling, grammar
 - Figures
