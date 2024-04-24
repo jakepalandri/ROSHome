@@ -605,5 +605,5 @@ Graduate Research.
 
 \let\toc@bibliography=\bibliography
 \renewcommand\bibliography[1]{%
-  \addcontentsline{toc}{chapter}{Bibliography}%
+  \addcontentsline{toc}{chapter}{References}%
   \toc@bibliography{#1}}
