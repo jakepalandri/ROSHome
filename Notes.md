@@ -97,12 +97,13 @@ History of the Smart Home
 		- Turn appliances on and off
 		- Predict the weather
         - 1967 - The kitchen computer
-            - Created by Neimann-Marcus
+            - Created by Honeywell
+            - Offered in Neiman Marcus Christmas Catalogue
             - Computer made for the housewife
             - Used in the kitchen
             - Recipe storage device
             - 0.6 - 2.5MHz Processor
-            - 4Kb of memory (expandable to 16 Kb) 
+            - 4Kb of memory (expandable to 16 Kb)
             - No display
             - Amazingly beautiful and hopelessly impractical
             - $10,000
@@ -114,22 +115,22 @@ History of the Smart Home
             - Developed in Scotland
             - Formed the basis for many domestic control installations for many decades
             - One of the first protocols to completely cover the home automation spectrum
-		- Power
-		- Lighting
-		- Security
+                - Power
+                - Lighting
+                - Security
             - Capable of controlling 256 devices on one circuit
             - Sent messages through the property's existing AC electrical wiring
-		- At the time this was an efficient way to send basic signals through large spaces
-            - Controllers ranged from switches to programmable timers
-        - Later advanced to be controllable from a computer
-            - Schedule events
-            - Decision-based sequences
+                - At the time this was an efficient way to send basic signals through large spaces
+                - Controllers ranged from switches to programmable timers
+            - Later advanced to be controllable from a computer
+                - Schedule events
+                - Decision-based sequences
     - 1980s
         - 3x Xanadu Houses
             - Solidify the concepts of home automation and computer control
             - Thorough implementations of lighting, heating and security
         - Home Robots
-            - Became achieveable
+            - Became achievable
                 - Microprocessors and baterries small enough to fit
             - Idea of robots as companions solidified through sci-fi movies
     - 1990s - Gerontechnology
@@ -156,7 +157,7 @@ History of the Smart Home
         - 1990s
             - 1991 - Electrolux Trilobite
                 - First robot vacuum
-                - Heralded the integration of the first smart home products that were not hard wired into the building
+                - Heralded the integration of the first smart home products that were not hard-wired into the building
                 - Truly smart appliances begun to emerge
             - Home computers became commonplace
             - Internet becoming more accessible and understandable

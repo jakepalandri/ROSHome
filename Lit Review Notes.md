@@ -7,7 +7,7 @@
     - free up time (ask chatgpt for a list of benefits/how can smart home technologies revolutionise) 
     - if going through history, ensure that it is in reference to the importance of the smarthome, or parallels in significance
 
-## Summary of existing literature (8 pages) - Half Wednesday / Half Thursday
+## Summary of existing literature (6-8 pages) - Half Wednesday / Half Thursday
 - Smart Environment
 - Robotics
 - Person tracking
