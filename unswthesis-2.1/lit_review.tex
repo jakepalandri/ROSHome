@@ -11,7 +11,7 @@ The Electronic Computing Home Operator (ECHO IV) was the first device designed s
 With the ability to compute shopping lists, control home temperature, limit children's television time with questionnaires and even tell the weather, this was the first glimpse at a whole-home computerised system that was capable of automating every element of home life.
 
 The following year saw the introduction of Honeywell's Kitchen Computer. A computer designed for housewives to use in the kitchen as a recipe storage device with a built-in chopping board.
-At \$10,000 United States Dollars (USD) in 1967 (nearly \$100,000 USD today when accounting for inflation), this recipe storage device which had no display, was well described as "amazingly beautiful and hopelessly impractical".
+At \$10,000 United States Dollars (USD) in 1967 (nearly \$100,000 USD today when accounting for inflation), this recipe storage device which had no display, was well described as ``amazingly beautiful and hopelessly impractical''.
 No units were ever sold.
 Despite its failure on the open market, the device received a lot of attention and the public began to imagine a future where homes would be interactive.
 
@@ -29,10 +29,10 @@ Along with this, the launch of the first-ever internet-connected refrigerator fr
 
 This brings us to the current century, where, in the early 2000s, technology began to boom.
 The home computer had become commonplace and the internet had become more accessible and understandable to the general public.
-More smart devices, like speakers that speak to you about news headlines, weather and act as an alarm, began to appear on store shelves at affordable price points and a home automation became realistically achievable goal.
+More smart devices, like speakers that speak to you about news headlines and weather or act as an alarm, began to appear on store shelves at affordable price points and home automation became a realistically achievable goal.
 
 Today, smart homes are now a reality, they are not exclusively for the eccentric and wealthy.
-They provide home owners comfort, security, energy efficiency and convenience at all times, regardless of if they are home or not.
+They provide homeowners comfort, security, energy efficiency and convenience at all times, regardless of whether they are home or not.
 Through the use of innovative technology, homeowners can turn their homes into state-of-the-art machines that can be controlled and monitored from anywhere in the world.
 
 It is clear to see that with every iteration of the development of increasingly quasi-intelligent smart devices, early adopters were promised a more comfortable lifestyle with menial tasks being delegated to machines, saving more time for leisure.
@@ -88,24 +88,24 @@ Their objective was to reduce the wastage of electricity ``due to [the] negligen
 
 The authors correctly identify one of the biggest issues with presence detection in common home automation deployments.
 Most setups use an array of infrared sensors to detect movement in a room but this poses a few challenges.
-Firstly, any movement in view of the sensors will trigger the action that is intended only for human presence.
-So if a book falls off a shelf or an animal runs past your sensors then we will get a false positive result from the sensor.
-Additionally, another limitation of this method, which was not outlined in this paper, is that if a person remains stationary in the room, while sitting on a couch for example, then we will get a false negative result suggesting that there is no human presence in the room.
+Firstly, any movement in view of the sensors will trigger an action that is intended only for human presence.
+So if a book falls off a shelf or an animal runs past your sensors then the sensor will report back a false positive result.
+Additionally, another limitation of this method, which was not outlined in this paper, is that if a person remains stationary in the room, while sitting on a couch for example, then there will be a false negative result suggesting that there is no human presence in the room.
 
 To solve these downfalls of existing implementations, they took a different approach, utilising AI to identify people through a camera in a living space, enabling them to differentiate between objects and people.
-However, there are a couple of areas that they did not explore that were within reach using the setup that they had implemented and that this thesis intends on expanding upon.
+However, there are a couple of areas that they did not explore that were within reach using the setup that they had implemented and that this thesis intends to expand upon.
 
-For starters, the authors only used the sensors as a toggle for LEDs in aim of reducing unnecessary energy use.
+For starters, the authors only used the sensors as a toggle for LEDs in the aim of reducing unnecessary energy use.
 This thesis aims to implement a system capable of executing more complex tasks such as controlling other smart devices in the house like a television or blinds with more potential states than just off and on.
-Additionally, to identify people in the camera, they used You only look once (Yolo), a computer vision AI model for used object detection, classification, and segmentation, which also has a built-in "skeletonisation" feature, allowing you to track a person's posture and make more intelligent decisions based on a person's movements.
-These two ideas present an opportunity to fill a potential gap in the market making more intelligent decisions in the home using existing technology and real world implementations.
+Additionally, to identify people in the camera, they used You only look once (Yolo), a computer vision AI model for used object detection, classification, and segmentation, which also has a built-in ``skeletonisation'' feature, allowing you to track a person's posture and make more intelligent decisions based on a person's movements.
+These two ideas present an opportunity to fill a potential gap in the market making more intelligent decisions in the home using existing technology and real-world implementations.
 
 \subsection{Human Action Recognition for Smart Home Automation}
 Another paper, from the Department of Computer Technology, University of Alicante, covers some potential methods of person tracking, human action recognition and behaviour analysis using cameras in the home~\cite{Chaa13}.
 Here, there is more of a focus on using this technology to support the elderly and the disabled, through ambient assisted living to improve their quality of life and maintain their independence.
 
-A. Chaaraoui et al., discuss their deployment with both RGB cameras collecting information and recognising "key poses" and hand gestures by creating silhouettes of the person, and also by using RGB-D cameras using the depth information to more accurately track movements.
-They were able to achieve this using a Microsoft Kinect camera and depth sensor with real-time performance, which is the sensor that was use for preliminary testing in this thesis as will be covered in more detail in Chapter~\ref{ch:project_prep}.
+A. Chaaraoui et al., discuss their deployment with both RGB cameras collecting information and recognising ``key poses'' and hand gestures by creating silhouettes of the person, and also by using RGB-D cameras using the depth information to more accurately track movements.
+They were able to achieve this using a Microsoft Kinect camera and depth sensor with real-time performance, which is the sensor that was used for preliminary testing in this thesis as will be covered in more detail in Chapter~\ref{ch:project_prep}.
 This existing deployment shows promising signs that the proposed setup should work smoothly in a home environment.
 
 While they were able to get these systems working in real-time, recognising primitive human actions such as standing, walking, sitting and falling, there was no mention in the paper of actual integration with home devices.
@@ -123,7 +123,7 @@ Lack of actual integration with smart home devices
 Smart homes today promise enhanced convenience, safety, and security through the connectivity of more and more devices and the automation of regular tasks.
 However, several critical challenges prove to be a hindrance to their effectiveness as well as widespread adoption and, in turn, the growth of the industry
 
-Interoperability issues between devices and existing platforms, the lack of genuine "intelligence" in these automated systems, and the constant reliance on internet access pose significant obstacles to realising the true potential of smart home technology.
+Interoperability issues between devices and existing platforms, the lack of genuine intelligence in these automated systems, and the constant reliance on internet access pose significant obstacles to realising the true potential of smart home technology.
 
 In an attempt to combat these challenges, this thesis aims to develop an entirely custom and customisable, intelligent environment where a user's movements will be able to accurately predict how to control devices within the home, through gesture recognition and behaviour prediction.
 Utilising local processing and sensor data, the system will enhance convenience, safety, and security without relying on internet connectivity or support from third-party companies to allow interoperability.

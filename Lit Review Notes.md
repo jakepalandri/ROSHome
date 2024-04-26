@@ -52,7 +52,7 @@ check canva or notes
 
 # Project Dependent Preparations (1-2 pages)
 
-## Can the student achieve the aims in the timeline for Thesis B and Thesis C? What progress has been made already? (1 Page) - Saturday
+## Can the student achieve the aims in the timeline for Thesis B and Thesis C? What progress has been made already? (1-2 pages) - Saturday
 - Progress
 - Roadblocks
 - Tech Stack
@@ -64,7 +64,7 @@ check canva or notes
     - Evidence of some upskilling (new programming languages, software, tools, project-specific knowledge required before taking Thesis Ba)
     - Preliminary results 
 
-# Document Presentation (1 Page) - Saturday
+# Document Presentation - Saturday
 - Report structure and layout
 - English skills – spelling, grammar
 - Figures
