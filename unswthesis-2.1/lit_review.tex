@@ -10,7 +10,8 @@ In 1966, there was a significant leap forward in home automation technology when
 The Electronic Computing Home Operator (ECHO IV) was the first device designed specifically for home automation and was hand-crafted with surplus electronic parts.
 With the ability to compute shopping lists, control home temperature, limit children's television time with questionnaires and even tell the weather, this was the first glimpse at a whole-home computerised system that was capable of automating every element of home life.
 
-The following year saw the introduction of Honeywell's Kitchen Computer. A computer designed for housewives to use in the kitchen as a recipe storage device with a built-in chopping board.
+The following year saw the introduction of Honeywell's Kitchen Computer.
+A computer designed for housewives to use in the kitchen as a recipe storage device with a built-in chopping board.
 At \$10,000 United States Dollars (USD) in 1967 (nearly \$100,000 USD today when accounting for inflation), this recipe storage device which had no display, was well described as ``amazingly beautiful and hopelessly impractical''.
 No units were ever sold.
 Despite its failure on the open market, the device received a lot of attention and the public began to imagine a future where homes would be interactive.
@@ -83,13 +84,13 @@ Not only will you not be able to access the devices remotely to control them or 
 \section{Review of Existing Literature}
 
 \subsection{Computer Vision for Smart Home Automation}
-In a paper published at the 2019 International Conference on Communication and Signal Processing, Mohammad Hasnain R. et al set out to ``develop a smart [Internet of Things] (IoT) based light control system'' using computer vision and artificial intelligence \cite{Hasn19}.
+In a paper published at the 2019 International Conference on Communication and Signal Processing, Mohammad Hasnain R. et al. set out to ``develop a smart [Internet of Things] (IoT) based light control system'' using computer vision (CV) and artificial intelligence \cite{Hasn19}.
 Their objective was to reduce the wastage of electricity ``due to [the] negligence and forgetfulness'' of people using the environment.
 
 The authors correctly identify one of the biggest issues with presence detection in common home automation deployments.
-Most setups use an array of infrared sensors to detect movement in a room but this poses a few challenges.
+Most setups use an array of infrared (IR) sensors to detect movement in a room but this poses a few challenges.
 Firstly, any movement in view of the sensors will trigger an action that is intended only for human presence.
-So if a book falls off a shelf or an animal runs past your sensors then the sensor will report back a false positive result.
+So if a book falls off a shelf or an animal runs past and interrupt the IR beams then the sensor will report back a false positive result.
 Additionally, another limitation of this method, which was not outlined in this paper, is that if a person remains stationary in the room, while sitting on a couch for example, then there will be a false negative result suggesting that there is no human presence in the room.
 
 To solve these downfalls of existing implementations, they took a different approach, utilising AI to identify people through a camera in a living space, enabling them to differentiate between objects and people.
@@ -97,27 +98,150 @@ However, there are a couple of areas that they did not explore that were within 
 
 For starters, the authors only used the sensors as a toggle for LEDs in the aim of reducing unnecessary energy use.
 This thesis aims to implement a system capable of executing more complex tasks such as controlling other smart devices in the house like a television or blinds with more potential states than just off and on.
-Additionally, to identify people in the camera, they used You only look once (Yolo), a computer vision AI model for used object detection, classification, and segmentation, which also has a built-in ``skeletonisation'' feature, allowing you to track a person's posture and make more intelligent decisions based on a person's movements.
+Furthermore, to identify people in the camera, they used You only look once (Yolo), a computer vision AI model for used object detection, classification, and segmentation, which also has a built-in ``skeletonisation'' feature, allowing you to track a person's posture and make more intelligent decisions based on a person's movements.
 These two ideas present an opportunity to fill a potential gap in the market making more intelligent decisions in the home using existing technology and real-world implementations.
+
+Aside from this paper, there has been extensive research into the use of computer vision in smart home deployments.
+Nonetheless, very few of these discuss the integration of computer vision with smart home devices, and even fewer attempt to implement this integration.
+There is lots of discussion around computer vision in homes but it is mostly regarding intrusion detection and security~\cite{Cucc05,Garc17,Nand20,Patc15,Sefa14,Zhan19}.
+
+V. Patchava et al. implemented a front end for a smart home with the ability to toggle devices and stream the video feed from a camera with computer vision capabilities, while C. González García et al. implemented a system that could detect the presence of people and measured the rate of true positives, false positives, true negatives and false negatives~\cite{Patc15,Garc17}.
+Others implemented presence detection with CV and were able to identify intruders and any weapon that they are carrying~\cite{Cucc05,Nand20}.
+These papers discuss facial recognition software and the ability to alert home owners of potential intruders.
+They even discuss integration with custom smart home dashboards and IoT platforms, but they do not discuss the integration of these systems with smart home devices and automation, which is the primary focus of this thesis.
 
 \subsection{Human Action Recognition for Smart Home Automation}
 Another paper, from the Department of Computer Technology, University of Alicante, covers some potential methods of person tracking, human action recognition and behaviour analysis using cameras in the home~\cite{Chaa13}.
-Here, there is more of a focus on using this technology to support the elderly and the disabled, through ambient assisted living to improve their quality of life and maintain their independence.
+Here, there is more of a focus on using this technology to support the elderly and the disabled, through ambient assisted living (AAL) to ``improv[e] their quality of life and [maintain] their independence.''
 
-A. Chaaraoui et al., discuss their deployment with both RGB cameras collecting information and recognising ``key poses'' and hand gestures by creating silhouettes of the person, and also by using RGB-D cameras using the depth information to more accurately track movements.
-They were able to achieve this using a Microsoft Kinect camera and depth sensor with real-time performance, which is the sensor that was used for preliminary testing in this thesis as will be covered in more detail in Chapter~\ref{ch:project_prep}.
+A. Chaaraoui et al. discuss their deployment with both RGB cameras collecting information and recognising ``key poses'' and hand gestures by creating silhouettes of the person, and also by using RGB-D cameras using the depth information to more accurately track movements.
+They were able to achieve this using a Microsoft Kinect camera and depth sensor ``with low-cost and real-time performance'', which is the same sensor that was used for preliminary testing in this thesis as will be covered in more detail in Chapter~\ref{ch:project_prep}.
 This existing deployment shows promising signs that the proposed setup should work smoothly in a home environment.
 
 While they were able to get these systems working in real-time, recognising primitive human actions such as standing, walking, sitting and falling, there was no mention in the paper of actual integration with home devices.
 
-In 2000, J. Krumm et al. followed very similar processes, using background subtraction to create silhouettes of people and overlaying depth data over the top of these cutouts~\cite{Krum00}.
+In 2000, J. Krumm et al. followed very similar processes, using background subtraction to create silhouettes of people and overlaying depth data over the top of these cutouts through stereo images~\cite{Krum00}.
 However, due to their early adoption of the technology they were somewhat limited by the computational power of computers during this period and had to run far more complicated and unwieldy setups that would not be suitable for a real home deployment today.
-This meant that their trackers ran at only 3.5 Hz and often had trouble tracking more than 3 people at a time or people wearing similarly coloured clothing.
+This meant that their trackers ran at only 3.5 Hz, even with the computational load shared between three computers, and often had trouble tracking more than 3 people at a time or people wearing similarly coloured clothing.
+
+They were able to integrate their system with some home devices with custom programs such as a wireless mouse that could be carried to any table in the room and the clicks and movements of the mouse would be redirected to the nearest computer display.
+Another program ``automatically start[ed] and stop[ped] a [Videocassette Recorder] (VCR) or [Digital Video Disc] (DVD) movie when a person sits on or stands up from a couch.''
+The film would also be ``automatically rerouted to different displays in the room, depending on where the person [sat].''
+
+These are similar objectives to what this thesis partially aims to achieve, however, the technology has advanced significantly since then and the proposed setup should be able to run on a single computer with a single camera and depth sensor, making it more accessible to the general public.
 
 \subsection{Gesture Recognition for Smart Home Automation}
+In 2017, S. Desai and A. Desai, proposed an algorithm for gesture recognition for home automation, also using the Microsoft Kinect~\cite{Desa17}.
+Their proposal was specific to only recognising hand gestures, no full-body tracking.
+This involved segmenting the hand from the image at a specified depth range of 250-650mm, removing the noise and background from the image and converting the RGB into a solid black and white outline, as shown in Figure~\ref{fig:hand_gestures}.
+The finger positions were then compared against a set of predefined gestures and then classified.
+The classification then defines the action that the system should take, sending a signal to an arduino board to control different home appliances such as a television, charger or fan.
+
+Using this technique, they were able to achieve an 88\% accuracy rate in recognising the gestures.
+This is not really a high enough accuracy rate for a real-world deployment, as users would have to repeat the gesture multiple times at least one in every 10 attempts in order to get the desired result.
+Additionally, this only worked when users were giving gestures within 65cm from the camera, and only within a 40cm range.
+This is not practical for day-to-day use as this would either require dozens of cameras per room, pread out every 1.3m, or it would require users to get up from wherever they are in the room and move to the camera in order to control their devices.
+In which case, they may as well control their devices manually.
+Due to these limitations, tracking gestures only via hand movements does not appear to be a viable solution for smart home automation, and full body tracking may be required to make this technology more practical for everyday use.
+
+\begin{figure}[!htb]
+    \caption{Extracted Hand Gestures from Microsoft Kinect~\protect\cite{Desa17}}
+    \centering
+    \includegraphics[width=0.5\textwidth]{Hand Gestures.png}
+    \label{fig:hand_gestures}
+\end{figure}
+
+This paper, among others, refers also to computer vision technology recognising gestures through wearable devices~\cite{Krum00,Star00,Vole22}.
+Implementing a system to track wearable devices opens up many possibilities for gesture recognition as well as the potential to integrate medical monitoring tools with it.
+In fact, using the wearable device, T. Starner et al. were able to track the user's gestures against control gestures, which measure continuous input from the user, with an accuracy of 95\% and user defined gestures with an accuract of 97\%~\cite{Star00}.
+
+Using a device that interacts directly with the user's body, is bound to significantly increase the accuracy of gesture recognition, as the device is able to measure it's own movements, and hence the user, as opposed to a potentially distant camera that attempts to infer the user's movements based on depth data.
+However, this creates a significant hurdle as the user must be wearing the device at all times in order to control their devices, which significantly impedes the user experience and reduces the inconvenience that this technology is supposed to alleviate.
+
+\subsection{Behaviour Monitoring for Elderly Care}
+In a 2017 paper, A Behaviour Monitoring System (BMS) for Ambient Assisted Living, S. Eisa, and A. Moreira constructed an environment that could monitor the behaviour of elderly people in their homes~\cite{Eisa17}.
+The system used passive infrared (PIR) sensors to monitor the movement of the elderly person between rooms and detect any deviations from their normal routine.
+The theory behind their practice was that ``[a]n elderly person remains in good health as long as he or she can carryon his/her daily activities as usual with no signiﬁcant deviations from the normal daily routine.''
+This meant that if the system could identify any irregularities, then it could alert a carer or family member to check in on the user to ensure they are okay and potentially catch any health issues early.
+
+This was implemented by treating the user's location in the house (by room) as a state machine, with the user able to transition states by moving between rooms, as shown in Figure~\ref{fig:state_machine}.
+From this, a transition matrix is created for a given time of the day, which represents the probabilities of the user either staying in the same room or moving from any room to another.
+Training an AI model to recognise the user's regular behaviour, the system could then recognise any deviations from this behaviour.
+If the behaviour was deemed abnormal, it would then be classified to determine possible causes of the deviation, such as the user oversleeping if they are in their bedroom for too long, Table~\ref{tab:abnormal_behaviours} shows the abnormal behaviours that the authors listed.
+
+\begin{figure}[!htb]
+    \caption{Room-to-room State Transition Model~\protect\cite{Eisa17}.}
+    \centering
+    \includegraphics[width=\textwidth]{AAL State Machine.png}
+    \label{fig:state_machine}
+\end{figure}
+
+\begin{table}[!htb]
+    \caption{Abnormal Behaviours---Descriptions and related health-declines~\protect\cite{Eisa17}.}
+    \centering
+    \makebox[\textwidth][c] {
+        \begin{tabular}{c c c}
+            \hline
+            \textbf{Behaviour} & \textbf{Description} & \textbf{Health-Declines} \\
+            \hline
+            OverSleeping &
+            \begin{tabular}{@{}c@{}}
+                An extended stay at bedroom;\\
+                longer than usual.
+            \end{tabular} &
+            Mobility problems, strokes. \\
+            \hline
+            LessSleeping &
+            \begin{tabular}{@{}c@{}}
+                Detected motion at one of the rooms, not a \\
+                bedroom, during the usual sleeping time.
+            \end{tabular} &
+            \begin{tabular}{@{}c@{}}
+                Having sleepless time due to anxiety, \\
+                depression or may be developing \\
+                Alzheimer’s diseases.
+            \end{tabular} \\
+            \hline
+            NotBackHome &
+            \begin{tabular}{@{}c@{}}
+                Monitored person stayed \\
+                outside longer than usual.
+            \end{tabular} &
+            \begin{tabular}{@{}c@{}}
+                Having trouble coming back home or get \\
+                lost or wondering outdoors.
+            \end{tabular} \\
+            \hline
+            Dead &
+            \begin{tabular}{@{}c@{}}
+                No movement and long stay at one of the \\
+                rooms, not bedroom nor outside;
+            \end{tabular} &
+            Death. \\
+            \hline
+        \end{tabular}
+    }
+    \label{tab:abnormal_behaviours}
+\end{table}
+
+The model they implemented also self updated once every week so that it could adapt to the user's ``behavioural changes that are not nevcessarily abnormal behaviours'' over time and account for seasonal changes in behaviour.
+This meant that they were able to implemet a behaviour monitoring system that learned to adapt over time and consistently monitor the user's behaviour for any irregularities with primitive PIR sensors.
+If this was achievable with such simple sensors, then the possibilities with more advanced depth sensors and computer vision should allow for more advanced behaviour monitoring and prediction.
 
 \section{Gaps in Literature}
-Lack of actual integration with smart home devices
+After a thorough review of existing literature in the space that is being explored by this thesis, it is clear that there has been extensive research into many of the facets of the proposed system in consideration.
+Computer vision is a widely researched field and has been applied to many different areas of smart home technology, from security to gesture recognition.
+Human action recognition and gesture recognition have both also been studied for decades.
+
+Despite this, there is a significant gap in the literature when it comes to the actual integration of these technologies with smart home devices and automation.
+Most of the literature either discusses the technology in isolation or discusses implementation into smart homes on a theoretical level.
+For example there are many papers that discuss the use of computer vision for intrusion detection and security in a smart home, but none of them consider the possibility to use this technology for automating tasks and controlling devices in the home. 
+Almost none of the papers have actually implemented the technology into a real-world smart home environment and tested the results.
+This presents a significant opportunity for this thesis to contribute to the field by providing a real-world implementation of these technologies and evaluating their performance and user experience.
+
+There is also an opportunity to dive into a new area of research by combining these technologies with behaviour prediction to create a truly intelligent smart home environment.
+Behaviour prediction and monitoring has been studied in the context of care for the elderly and disabled for ambient assisted living, but not in the context of smart home automation.
+If done correctly, combining these technologies could allow for a smart home environment that can predict a user's behaviour and automate tasks in the home based on these predictions, without the need for user input.
 
 \section{Problem Statement (Draft) - Need to include info from Lit review, not just history}
 Smart homes today promise enhanced convenience, safety, and security through the connectivity of more and more devices and the automation of regular tasks.

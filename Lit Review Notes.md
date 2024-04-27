@@ -1,24 +1,24 @@
 # Lit Review (12-15 pages)
 
-## Brief background (2 pages) - Wednesday
+<!-- ## Brief background (2 pages) - Wednesday
 - history
 - contextualise importance
     - revolutionises daily living, will set new standards for accessibility
     - free up time (ask chatgpt for a list of benefits/how can smart home technologies revolutionise) 
-    - if going through history, ensure that it is in reference to the importance of the smarthome, or parallels in significance
+    - if going through history, ensure that it is in reference to the importance of the smarthome, or parallels in significance -->
 
-## Summary of existing literature (6-8 pages) - Half Wednesday / Half Thursday
+<!-- ## Summary of existing literature (6-8 pages) - Half Wednesday / Half Thursday
 - Smart Environment
 - Robotics
 - Person tracking
 - 3D tracking
 - Behaviour monitoring
 - ROS - outline and relevance
-- Theory and principles behind it, not description
+- Theory and principles behind it, not description -->
 
-## Literature gaps (3 pages) - Half Wednesday / Half Thursday
+<!-- ## Literature gaps (3 pages) - Half Wednesday / Half Thursday
 lack of computer vision used in homes and home automation
-using AI for people tracking, gesture recogniction and behavioural predictive automation - lack of proper foundational knowledge, further innovate
+using AI for people tracking, gesture recogniction and behavioural predictive automation - lack of proper foundational knowledge, further innovate -->
 
 ## Problem statement (1 page) - Friday
 based on literature gaps
@@ -50,7 +50,7 @@ check canva or notes
     - AI and Machine Learning
     - etc
 
-# Project Dependent Preparations (1-2 pages)
+<!-- # Project Dependent Preparations (1-2 pages)
 
 ## Can the student achieve the aims in the timeline for Thesis B and Thesis C? What progress has been made already? (1-2 pages) - Saturday
 - Progress
@@ -62,11 +62,11 @@ check canva or notes
 
 - Project specific, but may include
     - Evidence of some upskilling (new programming languages, software, tools, project-specific knowledge required before taking Thesis Ba)
-    - Preliminary results 
+    - Preliminary results  -->
 
-# Document Presentation - Saturday
+<!-- # Document Presentation - Saturday
 - Report structure and layout
 - English skills – spelling, grammar
 - Figures
 - Clarity of writing
-- Citations consistent and correctly formatted
+- Citations consistent and correctly formatted -->
