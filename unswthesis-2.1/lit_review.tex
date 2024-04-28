@@ -133,7 +133,7 @@ These are similar objectives to what this thesis partially aims to achieve, howe
 \subsection{Gesture Recognition for Smart Home Automation}
 In 2017, S. Desai and A. Desai, proposed an algorithm for gesture recognition for home automation, also using the Microsoft Kinect~\cite{Desa17}.
 Their proposal was specific to only recognising hand gestures, no full-body tracking.
-This involved segmenting the hand from the image at a specified depth range of 250-650mm, removing the noise and background from the image and converting the RGB into a solid black and white outline, as shown in Figure~\ref{fig:hand_gestures}.
+This involved segmenting the hand from the image at a specified depth range of 250-650mm, removing the noise and background from the image and converting the RGB into a solid binary black and white image, as shown in Figure~\ref{fig:hand_gestures}.
 The finger positions were then compared against a set of predefined gestures and then classified.
 The classification then defines the action that the system should take, sending a signal to an arduino board to control different home appliances such as a television, charger or fan.
 
@@ -159,7 +159,7 @@ Using a device that interacts directly with the user's body, is bound to signifi
 However, this creates a significant hurdle as the user must be wearing the device at all times in order to control their devices, which significantly impedes the user experience and reduces the inconvenience that this technology is supposed to alleviate.
 
 \subsection{Behaviour Monitoring for Elderly Care}
-In a 2017 paper, A Behaviour Monitoring System (BMS) for Ambient Assisted Living, S. Eisa, and A. Moreira constructed an environment that could monitor the behaviour of elderly people in their homes~\cite{Eisa17}.
+In a 2017 paper, ``A Behaviour Monitoring System (BMS) for Ambient Assisted Living,'' S. Eisa, and A. Moreira constructed an environment that could monitor the behaviour of elderly people in their homes~\cite{Eisa17}.
 The system used passive infrared (PIR) sensors to monitor the movement of the elderly person between rooms and detect any deviations from their normal routine.
 The theory behind their practice was that ``[a]n elderly person remains in good health as long as he or she can carryon his/her daily activities as usual with no signiﬁcant deviations from the normal daily routine.''
 This meant that if the system could identify any irregularities, then it could alert a carer or family member to check in on the user to ensure they are okay and potentially catch any health issues early.
@@ -228,6 +228,17 @@ The model they implemented also self updated once every week so that it could ad
 This meant that they were able to implemet a behaviour monitoring system that learned to adapt over time and consistently monitor the user's behaviour for any irregularities with primitive PIR sensors.
 If this was achievable with such simple sensors, then the possibilities with more advanced depth sensors and computer vision should allow for more advanced behaviour monitoring and prediction.
 
+There is also some overlap in this field with the computer vision and gesture recognition technologies that have been discussed.
+M. Oudah et al. implemented a hand gesture recognition system, similar to that of S. Desai and A. Desai, but with the aim of assisting the elderly and disabled in their daily lives by allowing them to use gestures to get support if communication is a problem for them~\cite{Ouda21}.
+With working deployments of both of these technologies in the AAL field, this shows promising signs for potential in the home automation field.
+
+% \subsection{Multi-modal Smart Home Control}
+
+% Controlling devices in a smart home environment is not limited to just one method, users could control devices through voice commands, physical buttons, touch screens, gestures, or even through their behaviour.
+% Implementing a system that can control devices through multiple methods could provide a more seamless user experience and allow for more flexibility in how users interact with their devices.
+% Using gestures and voice commands in conjunction could allow users to control devices with more natural behaviours, for example, turning on a light by saying ``lights on'' and then making a gesture to indicate which light they want to turn on.
+% There have been several implementations of multi-modal control in robotics and IoT but many only explore the use of two methods on a single system, but not both modes of control working in conjunction~\cite{Han16,Megh20}.
+
 \section{Gaps in Literature}
 After a thorough review of existing literature in the space that is being explored by this thesis, it is clear that there has been extensive research into many of the facets of the proposed system in consideration.
 Computer vision is a widely researched field and has been applied to many different areas of smart home technology, from security to gesture recognition.
@@ -243,20 +254,26 @@ There is also an opportunity to dive into a new area of research by combining th
 Behaviour prediction and monitoring has been studied in the context of care for the elderly and disabled for ambient assisted living, but not in the context of smart home automation.
 If done correctly, combining these technologies could allow for a smart home environment that can predict a user's behaviour and automate tasks in the home based on these predictions, without the need for user input.
 
-\section{Problem Statement (Draft) - Need to include info from Lit review, not just history}
+\section{Problem Statement}
 Smart homes today promise enhanced convenience, safety, and security through the connectivity of more and more devices and the automation of regular tasks.
-However, several critical challenges prove to be a hindrance to their effectiveness as well as widespread adoption and, in turn, the growth of the industry
+However, several critical challenges prove to be a hindrance to their effectiveness as well as widespread adoption and, in turn, the growth of the industry.
 
 Interoperability issues between devices and existing platforms, the lack of genuine intelligence in these automated systems, and the constant reliance on internet access pose significant obstacles to realising the true potential of smart home technology.
 
 In an attempt to combat these challenges, this thesis aims to develop an entirely custom and customisable, intelligent environment where a user's movements will be able to accurately predict how to control devices within the home, through gesture recognition and behaviour prediction.
 Utilising local processing and sensor data, the system will enhance convenience, safety, and security without relying on internet connectivity or support from third-party companies to allow interoperability.
 
-The research objectives include designing and implementing artificial intelligence and computer vision for movement prediction and gesture control, integrating these into existing smart home infrastructure, and evaluating the performance and user experience of the environment.
-
-The anticipated outcomes of this research include advancements in smart home technology, improved user experiences, and insights into addressing the broader challenges in the field as outlined in the literature review.
-While the research focuses on addressing specific aspects of smart home functionality, certain limitations, such as device compatibility and privacy concerns, will be acknowledged and considered throughout the study.
+Moreover, with several gaps in the existing research and literature into this area, this thesis aims to be able to integrate computer vision techniques and depth sensor technology into a smart home environment, utitlising this data to assist in automation, not just home monitoring and security.
+This will provide a real-world implementation of these technologies and a live demonstration of the home's capabilities, as opposed to the theoretical implementations that are currently discussed in the recent literature.
+The implementation of behavioural prediction technology, commonly used in AAL systems, will also be explored to predict user behaviour and automate tasks in the home based on the user's regular routines.
 
 Overall, this research endeavours to contribute to the evolution of smart homes by introducing innovative approaches to enhance their intelligence and autonomy, ultimately improving the quality of life for users.
 
-\section{Aims and Outcomes}
+\section{Aims and Outcomes - DRAFT}
+The research objectives of this thesis include designing and implementing artificial intelligence and computer vision for movement prediction and gesture control, integrating these into existing smart home infrastructure, and evaluating the performance and user experience of the environment.
+
+With entirely locally processed data, the system will be able to control devices within the home without the need for internet connectivity, enhancing convenience, safety, and security for users.
+Computer vision techniques will be used to identify users in the home, and track their movements and gestures to control devices, while AI will be used to predict user behaviour and automate tasks in the home.
+
+The anticipated outcomes of this research include advancements in smart home technology, improved user experiences, and insights into addressing the broader challenges in the field as outlined in the literature review.
+While the research focuses on addressing specific aspects of smart home functionality, certain limitations, such as device compatibility and privacy concerns, will be acknowledged and considered throughout the study.
