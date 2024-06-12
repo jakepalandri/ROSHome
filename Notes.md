@@ -259,3 +259,5 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
     - Computation and automation running should all be done locally to solve this
 - Automation and routine failure
     - Devices
+- Privacy and Cyber security risks
+    - Solved by having local computation

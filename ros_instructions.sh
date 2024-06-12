@@ -5,7 +5,7 @@ roscore
 # TERMINAL 2:
 sr1
 srk
-roslaunch kinect2_bridge kinect2_bridge.launch depth_method:=opengl reg_method:=cpu publish_tf:=true
+roslaunch kinect2_bridge kinect2_bridge.launch depth_method:=opengl publish_tf:=true
 
 # TERMINAL 3:
 sr1
@@ -25,5 +25,6 @@ sr2
 # ROS2 PROGRAMS
 rviz2 # Open the kinect2.rviz config file
 source ~/rviz2_ws/src/install/setup.bash
+source ROSHome/install/setup.bash 
 ros2 run kinect_ascii listener # ros2 run package executable_name
 
