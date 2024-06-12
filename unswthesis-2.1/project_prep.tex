@@ -1,10 +1,10 @@
 \chapter{Project Preparations}\label{ch:project_prep}
-The first phase of this thesis consisted mostly of many attempts at getting a working environment set up on a Linux machine, running Robot Operating System (ROS).
+The first phase of this thesis consisted mostly of many attempts at getting a working environment set up on a Linux machine, running ROS.
 The main goal was to be able to allow depth cameras to communicate with ROS 2 and control simple devices through this system.
 ROS was chosen as the platform to control devices as it is already used by many of the devices set up in the lab and robots on the university campus.
 The lab also had Microsoft's Kinect v2 depth cameras already accessible and was known to have previously been successfully set up and used with ROS so this became the sensor of choice.
 
-While this all seemed simple in theory, having had previous work prove that the work was possible, in reality, the Kinect v2 integration with ROS was not regularly maintained and ROS had a new major version release in this period so it required a significant amount of work to get the device to communicate with a ROS 2 distribution.
+While this all seemed simple in theory, with previous work at the university proving that the proposed work was possible, in reality, the Kinect v2 integration with ROS was not regularly maintained and ROS had a new major version release in this period, so it required a significant amount of work to get the device to communicate with a ROS 2 distribution.
 
 \section{Progress and Roadblocks}
 
@@ -56,25 +56,25 @@ This is then sent via the IAI Kinect Bridge to ROS 1.
 Using the ROS 1 bridge, the data is then sent to ROS 2 where it can finally be read by the ROS Client Python library and more meaningful operations can be done with it.
 
 \section{Technology Stack}
-Using this setup for ROS and the Kinect, the final proposed tech stack for continuing development is as shown in Figure~\ref{fig:tech_stack}.
+Using this setup for ROS and the Kinect, the final proposed tech stack for continuing development is shown in Figure~\ref{fig:tech_stack}.
 
 The setup outlined previously will run on an Ubuntu machine within the home and connect to a Kinect v2 depth camera.
 External smart home devices will be controllable through ROS Foxy either via data from the Kinect or through scripts written in Python.
-Additionally, there will be a TypeScript frontend provided as well that will be accessible within the network to allow users to control devices manually.
+Additionally, there will be a TypeScript front-end provided as well that will be accessible within the network to allow users to control devices manually.
 This is because any smart home system should only ever add functionality to a home, never replace existing functionality.
 There should always be the option to control the devices manually.
 The web interface will also allow users to add new gestures to be recognised by the Kinect and to control devices in new ways.
-Users of the environment will be able to interact with both the front end and with the Kinect, via movement and gestures, to control devices in the home.
+Users of the environment will be able to interact with both the front-end and with the Kinect, via movement and gestures, to control devices in the home.
 
-\begin{figure}[!htb]
+\begin{figure}[H]
     \caption{Proposed Technology Stack}
-    \makebox[\textwidth][c]{\includegraphics[width=0.91\textheight,angle=90]{Tech Stack.png}}
+    \makebox[\textwidth][c]{\includegraphics[width=\textheight,angle=-90]{Tech Stack.png}}
     \label{fig:tech_stack}
 \end{figure}
 
 \newpage
 
-\section{Demonstration and Viability / Preliminary Results}
+\section{Preliminary Results}
 
 After the ROS environment was set up, a couple of demonstration programs were written in Python to test the functionality and as a proof of concept, to show that external devices could be controlled.
 
@@ -109,10 +109,12 @@ The third and final demonstration was a simple program that allowed the user to 
 By moving both hands in front of the Kinect, the user could move the turtle forwards, backwards, or stationary and turn the turtle left, right or stationary.
 The direction the turtle moved was dependent on the distance of the closest hand to the camera and the direction the turtle moved was dependent on the difference in the distances of the two hands to the camera.
 
+\textbf{Movement Controls:}\newline
 If the user's closest hand was closer than 200mm to the camera, the turtle would move forwards.\newline
 If the user's closest hand was further than 500mm from the camera, the turtle would move backwards.\newline
 If the user's closest hand was between these two distances, the turtle would remain stationary.
 
+\textbf{Rotation Controls:}\newline
 If the user's left hand was more than 200mm further from the camera than the right hand, the turtle would turn left.\newline
 If the user's right hand was more than 200mm further from the camera than the left hand, the turtle would turn right.\newline
 If the difference in distance between the two hands was less than 200mm, the turtles would not turn.

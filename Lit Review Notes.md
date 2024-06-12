@@ -20,12 +20,12 @@
 lack of computer vision used in homes and home automation
 using AI for people tracking, gesture recogniction and behavioural predictive automation - lack of proper foundational knowledge, further innovate -->
 
-## Problem statement (1 page) - Friday
+<!-- ## Problem statement (1 page) - Friday
 based on literature gaps
 summary of what you aim to do and investigate
 
 ## Aims and outcomes (1 page) - Friday
-check canva or notes
+check canva or notes -->
 
 # Project Plan (5-7 pages)
 
