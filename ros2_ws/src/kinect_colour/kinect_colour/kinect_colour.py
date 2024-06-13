@@ -16,13 +16,14 @@ class ReadKinectColour(Node):
         # i know this data is paired as step/width is 2
         # but this function is generic and would work for rgb values too
         combined_data = []
-        for i in range(0, len(msg.data), int(msg.step / msg.width)):
+        pixelInc = int(msg.step / msg.width)
+        for i in range(0, len(msg.data), pixelInc):
             sum = 0
             if (msg.is_bigendian):
-                for j in range(int(msg.step / msg.width)):
-                    sum += msg.data[i + j] << (8 * (int(msg.step / msg.width) - 1 - j))
+                for j in range(pixelInc):
+                    sum += msg.data[i + j] << (8 * (pixelInc-1 - j))
             else:
-                for j in range(int(msg.step / msg.width)):
+                for j in range(pixelInc):
                     sum += msg.data[i + j] << (8 * j)
             combined_data.append(sum)
 
