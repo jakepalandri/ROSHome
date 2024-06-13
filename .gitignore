@@ -12,3 +12,6 @@ unswthesis-2.1/*.lot
 unswthesis-2.1/*.toc
 unswthesis-2.1/*.out
 .vscode
+ros2_ws/build
+ros2_ws/install
+ros2_ws/log
