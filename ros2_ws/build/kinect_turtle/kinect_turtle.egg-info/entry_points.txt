@@ -1,3 +1,0 @@
-[console_scripts]
-listener = kinect_turtle.kinect_turtle:main
-

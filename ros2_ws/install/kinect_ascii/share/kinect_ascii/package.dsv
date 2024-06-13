@@ -1,6 +1,0 @@
-source;share/kinect_ascii/hook/pythonpath.ps1
-source;share/kinect_ascii/hook/pythonpath.dsv
-source;share/kinect_ascii/hook/pythonpath.sh
-source;share/kinect_ascii/hook/ament_prefix_path.ps1
-source;share/kinect_ascii/hook/ament_prefix_path.dsv
-source;share/kinect_ascii/hook/ament_prefix_path.sh

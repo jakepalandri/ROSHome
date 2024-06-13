@@ -1,3 +1,0 @@
-[console_scripts]
-listener = kinect_ascii.kinect_ascii:main
-

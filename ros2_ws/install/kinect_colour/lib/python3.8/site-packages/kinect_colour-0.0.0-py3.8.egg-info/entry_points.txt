@@ -1,3 +1,0 @@
-[console_scripts]
-listener = kinect_colour.kinect_colour:main
-
