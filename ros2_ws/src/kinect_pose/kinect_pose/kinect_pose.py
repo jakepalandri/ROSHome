@@ -43,19 +43,22 @@ class ReadKinectColour(Node):
     def listener_callback(self, msg):
         stream = bridge.imgmsg_to_cv2(msg, "bgr8")
         results = self.model(source=stream, show=True)
-        boxes = results[0].boxes
+        isPerson = results[0].keypoints.has_visible
         result_keypoint = results[0].keypoints.xyn.cpu().numpy()[0]
-        print(results)
-        # print(boxes)
-        # print(keypoints)
-        print(result_keypoint)
+        if (not isPerson):
+            print("No person detected")
+            return
         # LOGIC:
         # 1. Get the coordinates of the person's right wrist and right elbow
         right_wrist = result_keypoint[Point.RIGHT_WRIST]
         right_elbow = result_keypoint[Point.RIGHT_ELBOW]
+        print("Right wrist: ", right_wrist)
+        print("Right elbow: ", right_elbow)
         # 2. Get the coordinates of the person's left wrist and left elbow
         left_wrist = result_keypoint[Point.LEFT_WRIST]
         left_elbow = result_keypoint[Point.LEFT_ELBOW]
+        print("Left wrist: ", left_wrist)
+        print("Left elbow: ", left_elbow)
         # 3. Calculate the vector from the right elbow to the right wrist
         right_vector = right_wrist - right_elbow
         # 4. Calculate the vector from the left elbow to the left wrist
