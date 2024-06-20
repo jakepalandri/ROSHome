@@ -169,3 +169,7 @@ echo "alias sr2='source /opt/ros/foxy/setup.bash'" >> ~/.bashrc
 
 # ROS1 BRIDGE INSTALLATION - DEBIAN - YEP
 sudo apt install ros-foxy-ros1-bridge
+
+
+# THIS IS SPECIFIC TO MY SETUP WITH THE ROSHome FOLDER IN ~ 
+echo "alias srws='source ~/ROSHome/ros2_ws/install/setup.bash'" >> ~/.bashrc

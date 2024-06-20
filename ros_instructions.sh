@@ -30,5 +30,5 @@ sr2
 # ROS2 PROGRAMS
 # rviz2 # Open the kinect2.rviz config file
 # source ~/rviz2_ws/src/install/setup.bash
-source ~/ROSHome/ros2_ws/install/setup.bash 
+source ~/ROSHome/ros2_ws/install/setup.bash
 ros2 run kinect_pose listener # ros2 run package executable_name
