@@ -4,6 +4,9 @@ import numpy as np
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
+import numpy as np
+from cv_bridge import CvBridge
+bridge = CvBridge()
 
 class ReadKinectColour(Node):
     def __init__(self):
@@ -18,41 +21,8 @@ class ReadKinectColour(Node):
         self.subscription  # prevent unused variable warning
 
     def listener_callback(self, msg):
-        # i know this data is paired as step/width is 2
-        # but this function is generic and would work for rgb values too
-        combined_data = []
-        pixelInc = int(msg.step / msg.width)
-        for i in range(0, len(msg.data), pixelInc):
-            sum = 0
-            if (msg.is_bigendian):
-                for j in range(pixelInc):
-                    sum += msg.data[i + j] << (8 * (pixelInc - 1 - j))
-            else:
-                for j in range(pixelInc):
-                    sum += msg.data[i + j] << (8 * j)
-            combined_data.append(sum)
-        
-        data = []
-        for i in range(0, len(combined_data), msg.width):
-            row = []
-            for j in range(msg.width):
-                row.append(combined_data[i + j])
-            data.append(row)
-
-        rgb_data = []
-        for row in data:
-            new_row = []
-            for value in row:
-                new_val = [value >> 16 & 0b11111111, value >> 8 & 0b11111111, value & 0b11111111]
-                new_row.append(new_val)
-            rgb_data.append(new_row)
-
-        rgb_data = np.array(rgb_data, dtype="uint8")
-
-        results = self.model(rgb_data)
-        print("Names: ", results[0].names)
-        print("Keypoints: ", results[0].keypoints)
-        print("Boxes: ", results[0].boxes)
+        stream = bridge.imgmsg_to_cv2(msg, "bgr8")
+        results = self.model(source=stream, show=True)
 
 def main(args=None):
     rclpy.init(args=args)
