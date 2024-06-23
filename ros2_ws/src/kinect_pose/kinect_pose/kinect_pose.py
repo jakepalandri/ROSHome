@@ -1,6 +1,7 @@
 from enum import IntEnum
 from ultralytics import YOLO
 import torch
+import math
 import numpy as np
 import rclpy
 from rclpy.node import Node
@@ -41,35 +42,73 @@ class ReadKinectPose(Node):
 
     def listener_callback(self, image, depth):
         stream = bridge.imgmsg_to_cv2(image, "bgr8")
+        depth = bridge.imgmsg_to_cv2(depth, "passthrough")
         results = self.model(source=stream, show=True)
         isPerson = results[0].keypoints.has_visible
-        result_keypoint = results[0].keypoints.xyn.cpu().numpy()[0]
+        result_keypoint = results[0].keypoints.xy.cpu().numpy()[0]
         if (not isPerson):
             print("No person detected")
             return
         # LOGIC:
-        # 1. Get the coordinates of the person's right wrist and right elbow
+        # 1. Get the coordinates of the person's right wrist, elbow and hip
         right_wrist = result_keypoint[Point.RIGHT_WRIST]
         right_elbow = result_keypoint[Point.RIGHT_ELBOW]
-        print("Right wrist: ", right_wrist)
-        print("Right elbow: ", right_elbow)
-        # 2. Get the coordinates of the person's left wrist and left elbow
+        right_hip = result_keypoint[Point.RIGHT_HIP]
+        # 2. Get the coordinates of the person's left wrist, elbow and hip
         left_wrist = result_keypoint[Point.LEFT_WRIST]
         left_elbow = result_keypoint[Point.LEFT_ELBOW]
-        print("Left wrist: ", left_wrist)
-        print("Left elbow: ", left_elbow)
-        # 3. Calculate the vector from the right elbow to the right wrist
-        right_vector = right_wrist - right_elbow
-        # 4. Calculate the vector from the left elbow to the left wrist
-        left_vector = left_wrist - left_elbow
-        # 5. Determine which arm is more extended
-        # 5a. Determine distance from right wrist to right hip
-        right_hip = result_keypoint[Point.RIGHT_HIP]
-        right_distance = np.linalg.norm(right_wrist - right_hip)
-        # 5b. Determine distance from left wrist to left hip
         left_hip = result_keypoint[Point.LEFT_HIP]
+        # 3. Get depth data at the left and right wrist elbow and hip with some margin of error (maybe check the closest depth value (not 0) within a range)
+        diameter = 5
+        min_depth_right_elbow = math.inf
+        min_depth_right_wrist = math.inf
+        min_depth_right_hip = math.inf
+        min_depth_left_elbow = math.inf
+        min_depth_left_wrist = math.inf
+        min_depth_left_hip = math.inf
+        for i in range(-math.floor(diameter/2), math.ceil(diameter/2)):
+            for j in range(-math.floor(diameter/2), math.ceil(diameter/2)):
+                rounded_right_wrist = [ round(elem) for elem in right_wrist ]
+                rounded_right_elbow = [ round(elem) for elem in right_elbow ]
+                rounded_right_hip = [ round(elem) for elem in right_hip ]
+                rounded_left_wrist = [ round(elem) for elem in left_wrist ]
+                rounded_left_elbow = [ round(elem) for elem in left_elbow ]
+                rounded_left_hip = [ round(elem) for elem in left_hip ]
+                depth_right_wrist = depth[rounded_right_wrist[1] + i][rounded_right_wrist[0] + j]
+                depth_right_elbow = depth[rounded_right_elbow[1] + i][rounded_right_elbow[0] + j]
+                depth_right_hip = depth[rounded_right_hip[1] + i][rounded_right_hip[0] + j]
+                depth_left_wrist = depth[rounded_left_wrist[1] + i][rounded_left_wrist[0] + j]
+                depth_left_elbow = depth[rounded_left_elbow[1] + i][rounded_left_elbow[0] + j]
+                depth_left_hip = depth[rounded_left_hip[1] + i][rounded_left_hip[0] + j]
+                if (depth_right_wrist < min_depth_right_wrist and depth_right_wrist != 0):
+                    min_depth_right_wrist = depth_right_wrist
+                if (depth_left_hip < min_depth_left_hip and depth_left_hip != 0):
+                    min_depth_left_hip = depth_left_hip
+                if (depth_right_hip < min_depth_right_hip and depth_right_hip != 0):
+                    min_depth_right_hip = depth_right_hip
+                if (depth_left_elbow < min_depth_left_elbow and depth_left_elbow != 0):
+                    min_depth_left_elbow = depth_left_elbow
+                if (depth_left_wrist < min_depth_left_wrist and depth_left_wrist != 0):
+                    min_depth_left_wrist = depth_left_wrist
+                if (depth_right_elbow < min_depth_right_elbow and depth_right_elbow != 0):
+                    min_depth_right_elbow = depth_right_elbow
+        # 4. Convert the 2d coordinates to 3d coordinates with Z up and Y depth
+        right_wrist = np.array([right_wrist[0], min_depth_right_wrist, right_wrist[1]])
+        right_elbow = np.array([right_elbow[0], min_depth_right_elbow, right_elbow[1]])
+        right_hip = np.array([right_hip[0], min_depth_right_hip, right_hip[1]])
+        left_wrist = np.array([left_wrist[0], min_depth_left_wrist, left_wrist[1]])
+        left_elbow = np.array([left_elbow[0], min_depth_left_elbow, left_elbow[1]])
+        left_hip = np.array([left_hip[0], min_depth_left_hip, left_hip[1]])
+        # 5. Calculate the 3d vector for the left and right forearms
+        right_vector = right_wrist - right_elbow
+        left_vector = left_wrist - left_elbow
+        
+        # 7. Determine which arm is more extended
+        # 7a. Determine distance from right wrist to right hip
+        right_distance = np.linalg.norm(right_wrist - right_hip)
+        # 7b. Determine distance from left wrist to left hip
         left_distance = np.linalg.norm(left_wrist - left_hip)
-        # 5c. Compare the distances
+        # 7c. Compare the distances
         # NEED A MORE ADVANCED WAY TO DO THIS
         # NEED A MINIMUM EXTENSION THRESHOLD
         # Default to right arm
@@ -81,11 +120,6 @@ class ReadKinectPose(Node):
         else:
             print("Right arm is more extended")
             print(vector)
-
-        # 6. Get depth data at the right wrist and right elbow with some margin of error (maybe check the closest depth value (not 0) within a range)
-        # 7. Get depth data at the left wrist and left elbow
-        # 8. Calculate vector from right elbow to right wrist in 3D space
-        # 9. Calculate vector from left elbow to left wrist in 3D space
         # 10. Extend the vector to the ends of the room
         # 11. Determine what the person is pointing at with some margin of error
 
