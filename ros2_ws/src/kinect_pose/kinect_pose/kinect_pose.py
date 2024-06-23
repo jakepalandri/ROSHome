@@ -5,6 +5,7 @@ import numpy as np
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import Image
+from message_filters import TimeSynchronizer, Subscriber
 import numpy as np
 from cv_bridge import CvBridge
 bridge = CvBridge()
@@ -28,20 +29,18 @@ class Point(IntEnum):
     LEFT_ANKLE:     int = 15
     RIGHT_ANKLE:    int = 16
 
-class ReadKinectColour(Node):
+class ReadKinectPose(Node):
     def __init__(self):
-        super().__init__('read_kinect_color')
-        self.subscription = self.create_subscription(
-            Image,
-            '/kinect2/sd/image_color_rect',
-            self.listener_callback,
-            10)
+        super().__init__('read_kinect_pose')
         self.model = YOLO("yolov8m-pose.pt")
         self.model = self.model.to("cuda" if torch.cuda.is_available() else "cpu")
-        self.subscription  # prevent unused variable warning
+        colour_image = Subscriber(self, Image, "/kinect2/sd/image_color_rect")
+        depth_image = Subscriber(self, Image, "/kinect2/sd/image_depth")
+        self.tss = TimeSynchronizer([colour_image, depth_image], 10)
+        self.tss.registerCallback(self.listener_callback)
 
-    def listener_callback(self, msg):
-        stream = bridge.imgmsg_to_cv2(msg, "bgr8")
+    def listener_callback(self, image, depth):
+        stream = bridge.imgmsg_to_cv2(image, "bgr8")
         results = self.model(source=stream, show=True)
         isPerson = results[0].keypoints.has_visible
         result_keypoint = results[0].keypoints.xyn.cpu().numpy()[0]
@@ -94,14 +93,14 @@ class ReadKinectColour(Node):
 def main(args=None):
     rclpy.init(args=args)
 
-    read_kinect_colour = ReadKinectColour()
+    read_kinect_pose = ReadKinectPose()
 
-    rclpy.spin(read_kinect_colour)
+    rclpy.spin(read_kinect_pose)
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    read_kinect_colour.destroy_node()
+    read_kinect_pose.destroy_node()
     rclpy.shutdown()
 
 
