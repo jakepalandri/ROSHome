@@ -33,3 +33,6 @@ sr2
 srws
 # ros2 run package executable_name
 ros2 run kinect_pose listener
+
+# TERMINAL 5:
+mosquitto_sub -v -h localhost -p 1883 -t '#'
