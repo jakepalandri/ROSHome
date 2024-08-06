@@ -49,8 +49,13 @@ class ReadKinectPose(Node):
         self.tss.registerCallback(self.listener_callback)
 
         self.client = MqttClient()
+        self.frames_since_last_pub = 0
 
     def listener_callback(self, image, depth, info):
+        self.frames_since_last_pub += 1
+        if self.frames_since_last_pub < 30:
+            return
+
         stream = bridge.imgmsg_to_cv2(image, "bgr8")
         depth  = bridge.imgmsg_to_cv2(depth, "passthrough")
         rect_matrix = np.array(info.k).reshape(3, 3)
@@ -116,18 +121,18 @@ class ReadKinectPose(Node):
         # NEED A MINIMUM EXTENSION THRESHOLD -  CURRENTLY 500mm
         # DOESN'T ACCOUNT FOR IF THE PERSON'S SHOULDERS AND HIPS AREN'T VISIBLE
         # OR IF ONE SHOULDER AND OPPOSITE HIP ARE VISIBLE (DIAGONAL) - THIS SEEMS LIKE A RARE EDGE CASE
-        print("LWrist:    ", left_wrist_3d       )
-        print("LHip:      ", left_hip_3d         )
-        print("LSldr:     ", left_shldr_3d       )
-        print("RWrist:    ", right_wrist_3d      )
-        print("RHip:      ", right_hip_3d        )
-        print("RSldr:     ", right_shldr_3d      )
-        print("LHipDist:  ", left_hip_distance   )
-        print("RHipDist:  ", right_hip_distance  )
-        print("LSldrDist: ", left_shldr_distance )
-        print("RSldrDist: ", right_shldr_distance)
-        print("LVector:   ", left_vector         )
-        print("RVector:   ", right_vector        )
+        # print("LWrist:    ", left_wrist_3d       )
+        # print("LHip:      ", left_hip_3d         )
+        # print("LSldr:     ", left_shldr_3d       )
+        # print("RWrist:    ", right_wrist_3d      )
+        # print("RHip:      ", right_hip_3d        )
+        # print("RSldr:     ", right_shldr_3d      )
+        # print("LHipDist:  ", left_hip_distance   )
+        # print("RHipDist:  ", right_hip_distance  )
+        # print("LSldrDist: ", left_shldr_distance )
+        # print("RSldrDist: ", right_shldr_distance)
+        # print("LVector:   ", left_vector         )
+        # print("RVector:   ", right_vector        )
 
         # If hips aren't visible, use distance from shoulders
         left_distance  = left_hip_distance
@@ -137,9 +142,9 @@ class ReadKinectPose(Node):
             left_distance  = left_shldr_distance
             right_distance = right_shldr_distance
             threshold = shldr_threshold
-            print("Using shoulder dist")
-        else:
-            print("Using hip dist")
+            # print("Using shoulder dist")
+        # else:
+            # print("Using hip dist")
         
         # 6d. Compare the distances
         if (self.arm_is_extended(left_distance, threshold) and
@@ -147,41 +152,54 @@ class ReadKinectPose(Node):
             self.vector_is_valid(left_vector)):
             vector = left_vector
             origin = left_wrist_3d
-            print("Left arm is more extended")
+            # print("Left arm is more extended")
         elif (self.arm_is_extended(right_distance, threshold) and
               right_distance >= left_distance and
               self.vector_is_valid(right_vector)):
             vector = right_vector
             origin = right_wrist_3d
-            print("Right arm is more extended")
+            # print("Right arm is more extended")
         else:
-            print("Person is pointing at nothing")
+            # print("Person is pointing at nothing")
             # self.client.pub("kinect_pose", "nothing")
-            return 
+            return
 
         # 7. Extend the vector to the ends of the room
         extended_point = self.extend_vector_to_boundary(origin, vector)
         print(extended_point)
 
+        topic = ""
+        payload = ""
         # 8. Determine what the person is pointing at with some margin of error
         if (extended_point[0] == self.min[0]):
             print("Person is pointing at the right wall")
-            self.client.pub("kinect_pose", "right_wall")
+            # topic = "zigbee2mqtt/Ikea Light/set"
+            # payload = '{"state": "OFF"}'
         elif (extended_point[0] == self.max[0]):
             print("Person is pointing at the left wall")
-            self.client.pub("kinect_pose", "left_wall")
+            # topic = "zigbee2mqtt/Ikea Light/set"
+            # payload = '{"state": "OFF"}'
         elif (extended_point[1] == self.min[1]):
             print("Person is pointing at the floor")
-            self.client.pub("kinect_pose", "floor")
+            # topic = "zigbee2mqtt/Ikea Light/set"
+            # payload = '{"state": "OFF"}'
         elif (extended_point[1] == self.max[1]):
             print("Person is pointing at the ceiling")
-            self.client.pub("kinect_pose", "ceiling")
+            print("Toggle light")
+            topic = "zigbee2mqtt/Ikea Light/set"
+            payload = '{"state": "TOGGLE"}'
         elif (extended_point[2] == self.min[2]):
             print("Person is pointing at the front wall")
-            self.client.pub("kinect_pose", "front_wall")
+            topic = "zigbee2mqtt/IR Emitter/set"
+            payload = '{"ir_code_to_send": "C38JNwLVBDcCgAI3AuAHB+ADE0ALgAEBnGTgGzPAAUA3AYAC4BUzQAHAewmAAjcCgAI3AoAC"}'
         elif (extended_point[2] == self.max[2]):
             print("Person is pointing at the back wall")
-            self.client.pub("kinect_pose", "back_wall")
+            # topic = "zigbee2mqtt/Ikea Light/set"
+            # payload = '{"state": "OFF"}'
+        
+        if (topic != "" and payload != ""):
+            self.client.pub(topic, payload)
+            self.frames_since_last_pub = 0
     
     def min_depth(self, depth, keypoint):
         diameter = 10
@@ -215,7 +233,7 @@ class ReadKinectPose(Node):
                 t_values.extend([t_min, t_max])
         
         # for debugging when t_values is empty
-        print("DEBUG:\n  Point : " +  point + "\n  Vector: " + vector)
+        # print("DEBUG:\n  Point : " +  point + "\n  Vector: " + vector)
 
         t_values = [t for t in t_values if t > 0]
 
