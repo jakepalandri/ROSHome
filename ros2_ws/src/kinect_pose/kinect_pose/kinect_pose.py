@@ -34,8 +34,8 @@ class Point(IntEnum):
 class ReadKinectPose(Node):
     def __init__(self):
         super().__init__('read_kinect_pose')
-        self.min = [-5000, -1000, 0000]
-        self.max = [ 5000,  3000, 5000]
+        self.min = [-2500, -1000, 0000]
+        self.max = [ 2500,  3000, 5000]
 
         self.model = YOLO("yolov8m-pose.pt")
         self.model = self.model.to("cuda" if torch.cuda.is_available() else "cpu")
@@ -50,6 +50,8 @@ class ReadKinectPose(Node):
 
         self.client = MqttClient()
         self.frames_since_last_pub = 0
+        self.frames_holding_gesture = 0
+        self.last_gesture = ""
 
     def listener_callback(self, image, depth, info):
         self.frames_since_last_pub += 1
@@ -63,7 +65,7 @@ class ReadKinectPose(Node):
         isPerson = results[0].keypoints.has_visible
         result_keypoint = results[0].keypoints.xy.cpu().numpy()[0]
 
-        if (not isPerson):
+        if not isPerson:
             print("No person detected")
             return
         
