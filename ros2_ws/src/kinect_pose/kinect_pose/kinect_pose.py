@@ -148,60 +148,45 @@ class ReadKinectPose(Node):
         # else:
             # print("Using hip dist")
         
-        # 6d. Compare the distances
-        if (self.arm_is_extended(left_distance, threshold) and
-            left_distance > right_distance and
-            self.vector_is_valid(left_vector)):
-            vector = left_vector
-            origin = left_wrist_3d
-            # print("Left arm is more extended")
-        elif (self.arm_is_extended(right_distance, threshold) and
-              right_distance >= left_distance and
-              self.vector_is_valid(right_vector)):
-            vector = right_vector
-            origin = right_wrist_3d
-            # print("Right arm is more extended")
-        else:
-            # print("Person is pointing at nothing")
-            # self.client.pub("kinect_pose", "nothing")
+        left_gesture = "none"
+        right_gesture = "none"
+        if self.arm_is_extended(left_distance, threshold) and self.vector_is_valid(left_vector):
+            left_gesture = self.pointing_at(left_wrist_3d, left_vector)
+        if self.arm_is_extended(right_distance, threshold) and self.vector_is_valid(right_vector):
+            right_gesture = self.pointing_at(right_wrist_3d, right_vector)
+
+        if left_gesture == "none" and right_gesture == "none":
             return
-
-        # 7. Extend the vector to the ends of the room
-        extended_point = self.extend_vector_to_boundary(origin, vector)
-        print(extended_point)
-
-        topic = ""
-        payload = ""
-        # 8. Determine what the person is pointing at with some margin of error
-        if (extended_point[0] == self.min[0]):
-            print("Person is pointing at the right wall")
-            # topic = "zigbee2mqtt/Ikea Light/set"
-            # payload = '{"state": "OFF"}'
-        elif (extended_point[0] == self.max[0]):
-            print("Person is pointing at the left wall")
-            # topic = "zigbee2mqtt/Ikea Light/set"
-            # payload = '{"state": "OFF"}'
-        elif (extended_point[1] == self.min[1]):
-            print("Person is pointing at the floor")
-            # topic = "zigbee2mqtt/Ikea Light/set"
-            # payload = '{"state": "OFF"}'
-        elif (extended_point[1] == self.max[1]):
-            print("Person is pointing at the ceiling")
-            print("Toggle light")
-            topic = "zigbee2mqtt/Ikea Light/set"
-            payload = '{"state": "TOGGLE"}'
-        elif (extended_point[2] == self.min[2]):
-            print("Person is pointing at the front wall")
-            topic = "zigbee2mqtt/IR Emitter/set"
-            payload = '{"ir_code_to_send": "C38JNwLVBDcCgAI3AuAHB+ADE0ALgAEBnGTgGzPAAUA3AYAC4BUzQAHAewmAAjcCgAI3AoAC"}'
-        elif (extended_point[2] == self.max[2]):
-            print("Person is pointing at the back wall")
-            # topic = "zigbee2mqtt/Ikea Light/set"
-            # payload = '{"state": "OFF"}'
+    
+        topic = "kinect_pose"
+        gesture = "left_arm_" + left_gesture + "_right_arm_" + right_gesture
+        if left_gesture == "none":
+            gesture = "right_arm_" + right_gesture
+        elif right_gesture == "":
+            gesture = "left_arm_" + left_gesture
         
-        if (topic != "" and payload != ""):
-            self.client.pub(topic, payload)
-            self.frames_since_last_pub = 0
+        payload = '{"gesture": "' + gesture + '"}'
+        
+        # if new gesture, reset timer, needs to be held for 2 frames
+        if self.last_gesture != gesture:
+            print("old gesture: " + self.last_gesture + " new gesture: " + gesture)
+            self.frames_holding_gesture = 1
+            self.last_gesture = gesture
+            return
+        
+        # if gesture has been held for less than 2 frames, increment
+        if self.frames_holding_gesture < 2:
+            print("frames holding gesture: " + str(self.frames_holding_gesture))
+            self.frames_holding_gesture += 1
+            return
+        
+        # otherwise, send the message        
+        self.last_gesture = ""
+        self.frames_holding_gesture = 0
+
+        self.client.pub(topic, payload)
+        print("sending message: " + payload)
+        self.frames_since_last_pub = 0
     
     def min_depth(self, depth, keypoint):
         diameter = 10
@@ -234,17 +219,43 @@ class ReadKinectPose(Node):
                 t_max = (self.max[i] - point[i]) / vector[i]
                 t_values.extend([t_min, t_max])
         
-        # for debugging when t_values is empty
-        # print("DEBUG:\n  Point : " +  point + "\n  Vector: " + vector)
 
         t_values = [t for t in t_values if t > 0]
 
+        # for debugging when t_values is empty
+        t_min = 0
+        try:
+            t_min = min(t_values)
+        except Exception as e:
+            print("DEBUG:\n  Point : " +  point + "\n  Vector: " + vector)
+            raise e
+        
         # Find the smallest positive t-value
-        t_min = min(t_values)
 
         # Extend the vector to the boundary
         extended_point = point + t_min * vector
+        # Round off small values
+        extended_point[np.abs(extended_point) < 0.0001] = 0
+
         return extended_point
+    
+    def pointing_at(self, origin, vector):
+        extended_point = self.extend_vector_to_boundary(origin, vector)
+        
+        if extended_point[0] == self.min[0]:
+            return "right"
+        elif extended_point[0] == self.max[0]:
+            return "left"
+        elif extended_point[1] == self.min[1]:
+            return "floor"
+        elif extended_point[1] == self.max[1]:
+            return "ceiling"
+        elif extended_point[2] == self.min[2]:
+            return "front"
+        elif extended_point[2] == self.max[2]:
+            return "back"
+        else:
+            return "none"
     
     def vector_is_valid(self, vector):
         return np.isfinite(vector).all() and np.any(vector != 0)
