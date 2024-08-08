@@ -49,15 +49,10 @@ class ReadKinectPose(Node):
         self.tss.registerCallback(self.listener_callback)
 
         self.client = MqttClient()
-        self.frames_since_last_pub = 0
         self.frames_holding_gesture = 0
         self.last_gesture = ""
 
     def listener_callback(self, image, depth, info):
-        self.frames_since_last_pub += 1
-        if self.frames_since_last_pub < 30:
-            return
-
         stream = bridge.imgmsg_to_cv2(image, "bgr8")
         depth  = bridge.imgmsg_to_cv2(depth, "passthrough")
         rect_matrix = np.array(info.k).reshape(3, 3)
@@ -180,13 +175,9 @@ class ReadKinectPose(Node):
             self.frames_holding_gesture += 1
             return
         
-        # otherwise, send the message        
-        self.last_gesture = ""
-        self.frames_holding_gesture = 0
-
+        # otherwise, send the message
         self.client.pub(topic, payload)
         print("sending message: " + payload)
-        self.frames_since_last_pub = 0
     
     def min_depth(self, depth, keypoint):
         diameter = 10
