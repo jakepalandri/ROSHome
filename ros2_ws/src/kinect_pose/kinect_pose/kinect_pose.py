@@ -180,10 +180,7 @@ class ReadKinectPose(Node):
             self.frames_holding_gesture += 1
             return
         
-        # otherwise, send the message        
-        self.last_gesture = ""
-        self.frames_holding_gesture = 0
-
+        # otherwise, send the message
         self.client.pub(topic, payload)
         print("sending message: " + payload)
         self.frames_since_last_pub = 0
