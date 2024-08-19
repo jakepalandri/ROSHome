@@ -101,7 +101,7 @@ class ReadKinectPose(Node):
         right_vector = right_wrist_3d - right_elbow_3d
         left_vector  = left_wrist_3d  - left_elbow_3d
         
-        # 6. Determine which arm is more extended
+        # 6. Determine if arm is extended
         # 6a. Determine distance from right wrist to hip and shoulder
         right_hip_distance   = np.linalg.norm(right_wrist_3d - right_hip_3d  )
         right_shldr_distance = np.linalg.norm(right_wrist_3d - right_shldr_3d)
@@ -142,7 +142,8 @@ class ReadKinectPose(Node):
             # print("Using shoulder dist")
         # else:
             # print("Using hip dist")
-        
+
+        # 7. Determine user's gesture
         left_gesture = "none"
         right_gesture = "none"
         if self.arm_is_extended(left_distance, threshold) and self.vector_is_valid(left_vector):
@@ -162,20 +163,21 @@ class ReadKinectPose(Node):
         
         payload = '{"gesture": "' + gesture + '"}'
         
-        # if new gesture, reset timer, needs to be held for 2 frames
+        # 8. Send gesture message
+        # 8a. If new gesture, reset timer, needs to be held for 2 frames
         if self.last_gesture != gesture:
             print("old gesture: " + self.last_gesture + " new gesture: " + gesture)
             self.frames_holding_gesture = 1
             self.last_gesture = gesture
             return
         
-        # if gesture has been held for less than 2 frames, increment
+        # 8b. If gesture has been held for less than 2 frames, increment
         if self.frames_holding_gesture < 2:
             print("frames holding gesture: " + str(self.frames_holding_gesture))
             self.frames_holding_gesture += 1
             return
         
-        # otherwise, send the message
+        # 8c. Otherwise, send the message
         self.client.pub(topic, payload)
         print("sending message: " + payload)
     
