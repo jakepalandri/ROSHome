@@ -220,7 +220,7 @@ class ReadKinectPose(Node):
         try:
             t_min = min(t_values)
         except Exception as e:
-            print("DEBUG:\n  Point : " +  point + "\n  Vector: " + vector)
+            print("DEBUG:\n  Point : " +  np.array2string(point) + "\n  Vector: " + np.array2string(vector))
             raise e
         
         # Find the smallest positive t-value

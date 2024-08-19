@@ -31,6 +31,9 @@ sr2
 # rviz2 # Open the kinect2.rviz config file
 # source ~/rviz2_ws/src/install/setup.bash
 srws
+# colcon build the package first, ensuring in correct directory
+cd ~/ROSHome/ros2_ws
+colcon build --packages-select kinect_pose
 # ros2 run package executable_name
 ros2 run kinect_pose listener
 
