@@ -24,8 +24,7 @@ class AudioPublisher(Node):
 
         device_info = sd.query_devices(self.input_dev_num, 'input')
         # soundfile expects an int, sounddevice provides a float:
-        
-        self.samplerate = int(device_info['default_samplerate'])
+        self.samplerate = int(device_info['default_samplerate']) #44100
         
         print(f"input sample rate {self.samplerate}")
         self.speech_recognize()        
@@ -55,8 +54,6 @@ class AudioPublisher(Node):
                 while(True):
                     print("I am Alive")
                     sleep(300)
-
-
         except Exception as e:
             exit(type(e).__name__ + ': ' + str(e))
 
