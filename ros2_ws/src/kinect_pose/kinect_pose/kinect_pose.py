@@ -44,8 +44,9 @@ class ReadKinectPose(Node):
         color_image = Subscriber(self, Image, "/kinect2/hd/image_color_rect")
         depth_image = Subscriber(self, Image, "/kinect2/hd/image_depth_rect")
         camera_info = Subscriber(self, CameraInfo, "/kinect2/hd/camera_info")
+        speech_info = Subscriber(self, String, "/speech_to_text")
 
-        self.tss = TimeSynchronizer([color_image, depth_image, camera_info], 10)
+        self.tss = TimeSynchronizer([color_image, depth_image, camera_info, speech_info], 10)
         self.tss.registerCallback(self.listener_callback)
 
         self.client = MqttClient()

@@ -15,7 +15,7 @@ class VoskSpeechRecognition(Node):
     def __init__(self):
         # Set the path to your VOSK model
         super().__init__("vosk_speech_recognition")
-        self.pub_audio = self.create_publisher(String, '/audio', 10)
+        self.pub_audio = self.create_publisher(String, '/speech_to_text', 10)
 
         model_path = "/home/jake/ROSHome/ros2_ws/models/vosk-model-en-us-0.42-gigaspeech"
         self.q = queue.Queue()
