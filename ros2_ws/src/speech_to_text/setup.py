@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'audio_stream'
+package_name = 'speech_to_text'
 
 setup(
     name=package_name,
@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'listener = audio_stream.audio_stream:main'
+            'listener = speech_to_text.speech_to_text:main',
         ],
     },
 )
