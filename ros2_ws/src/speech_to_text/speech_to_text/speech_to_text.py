@@ -26,7 +26,7 @@ class VoskSpeechRecognition(Node):
             raise ValueError('No input device found, device number == -1')
  
         device_info = sd.query_devices(self.input_dev_num, 'input')
-        self.samplerate = int(device_info['default_samplerate'])
+        self.sample_rate = int(device_info['default_samplerate'])
  
         self.model = vosk.Model(model_path)
         self.speech_recognize()
@@ -38,30 +38,40 @@ class VoskSpeechRecognition(Node):
  
     def speech_recognize(self):
         try:
-            with sd.RawInputStream(samplerate=self.samplerate, blocksize=16000, device=self.input_dev_num, dtype='int16',
+            with sd.RawInputStream(samplerate=self.sample_rate, blocksize=16000, device=self.input_dev_num, dtype='int16',
                                    channels=1, callback=self.stream_callback):
                 print('Started recording')
-                rec = vosk.KaldiRecognizer(self.model, self.samplerate)
+                rec = vosk.KaldiRecognizer(self.model, self.sample_rate)
+                start_time_ns = self.get_clock().now().nanoseconds
+                print(start_time_ns)
+
+                # output alternative words in case of misinterpretation
                 rec.SetMaxAlternatives(5)
+                # output words with time stamps
+                rec.SetWords(True)
+
                 print("Vosk is ready to listen!")
                 while True:
                     data = self.q.get()
                     if rec.AcceptWaveform(data):
                         result = rec.FinalResult()
+
                         print(result)
+
                         result_dict = json.loads(result)
                         text = result_dict["alternatives"][0]["text"]
-                        if len(text) > 2:
+                        
+                        if len(text) > 0:
                             print("\033[91mFinal result:\033[0m", text)
+
+                            result_dict["start_time_ns"] = start_time_ns
+                            result_with_time = json.dumps(result_dict)
+
                             msg = String()
-                            msg.data = text
+                            msg.data = result
                             self.pub_audio.publish(msg)
+                        
                         rec.Reset()
-                    else:
-                        partial_result = rec.PartialResult()
-                        if len(partial_result) > 20:
-                            partial_dict = json.loads(partial_result)
-                            #print("Partial result:", partial_dict["partial"])
  
         except KeyboardInterrupt as e:
             print("\nStopping the VOSK speech recognition...")
@@ -76,8 +86,3 @@ def main(args=None):
     recognizer.speech_recognize()
     rclpy.spin(recognizer)
     rclpy.shutdown()
-
-
-# if __name__ == '__main__':
-#     recognizer = VoskSpeechRecognition()
-#     recognizer.speech_recognize()
