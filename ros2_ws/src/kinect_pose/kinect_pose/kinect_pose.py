@@ -53,18 +53,28 @@ class ReadKinectPose(Node):
         self.frames_holding_gesture = 0
         self.last_gesture = ""
 
-    def listener_callback(self, image, depth, info):
-        stream = bridge.imgmsg_to_cv2(image, "bgr8")
-        depth  = bridge.imgmsg_to_cv2(depth, "passthrough")
-        rect_matrix = np.array(info.k).reshape(3, 3)
-        results = self.model(source=stream, show=True)
-        isPerson = results[0].keypoints.has_visible
+        self.gesture_history = []
+
+    def listener_callback(self, image, depth, info, speech):
+        stream          = bridge.imgmsg_to_cv2(image, "bgr8"       )
+        depth           = bridge.imgmsg_to_cv2(depth, "passthrough")
+        rect_matrix     = np.array(info.k).reshape(3, 3)
+        results         = self.model(source=stream, show=True)
+        gesture_time    = self.get_clock().now().nanoseconds
+        isPerson        = results[0].keypoints.has_visible
         result_keypoint = results[0].keypoints.xy.cpu().numpy()[0]
 
+        left_gesture,
+        right_gesture,
+        left_distance,
+        right_distance = self.determine_gesture(depth, rect_matrix, result_keypoint, isPerson)
+        # self.send_gesture(left_gesture, right_gesture)
+        self.store_gesture(left_gesture, right_gesture, left_distance, right_distance, gesture_time)
+
+    def determine_gesture(self, depth, rect_matrix, result_keypoint, isPerson):
         if not isPerson:
-            print("No person detected")
-            return
-        
+            return "none", "none", 0, 0
+
         # LOGIC:
         # 1. Get the coordinates of the person's right wrist, elbow, hip and shoulder
         right_wrist_pixel = result_keypoint[Point.RIGHT_WRIST   ]
@@ -152,15 +162,19 @@ class ReadKinectPose(Node):
         if self.arm_is_extended(right_distance, threshold) and self.vector_is_valid(right_vector):
             right_gesture = self.pointing_at(right_wrist_3d, right_vector)
 
+        return left_gesture, right_gesture, left_distance, right_distance
+
+
+    def send_gesture(self, left_gesture, right_gesture):
         if left_gesture == "none" and right_gesture == "none":
             return
-    
+
         # 8. Prepare gesture message
         topic = "kinect_pose"
         gesture = "left_arm_" + left_gesture + "_right_arm_" + right_gesture
         if left_gesture == "none":
             gesture = "right_arm_" + right_gesture
-        elif right_gesture == "":
+        elif right_gesture == "none":
             gesture = "left_arm_" + left_gesture
         
         payload = '{"gesture": "' + gesture + '"}'
@@ -182,7 +196,35 @@ class ReadKinectPose(Node):
         # 9c. Otherwise, send the message
         self.client.pub(topic, payload)
         print("sending message: " + payload)
-    
+
+    def store_gesture(self, left_gesture, right_gesture, left_distance, right_distance, gesture_time):
+        # 7b. Determine single gesture
+        gesture = ""
+        if left_gesture != "none" and right_gesture != "none":
+            if left_distance > right_distance:
+                gesture = left_gesture
+            else:
+                gesture = right_gesture
+        else:
+            if left_gesture != "none":
+                gesture = left_gesture
+            else:
+                gesture = right_gesture
+        
+        # 8. store gesture message
+        if len(self.gesture_history) < 2:
+            self.gesture_history.append({"time": gesture_time, "gesture": gesture})
+            return
+
+        last = self.gesture_history[-1]
+        prev = self.gesture_history[-2]
+        # new gesture is closer to 250ms since the last gesture
+        if abs(gesture_time - prev.time - 250000000) < abs(last.time - prev.time - 250000000):
+            self.gesture_history[-1] = {"time": gesture_time, "gesture": gesture}
+        # it has been more than 250ms since the last gesture this gesture is not closer to the 250ms mark
+        else:
+            self.gesture_history.append({"time": gesture_time, "gesture": gesture})
+
     def min_depth(self, depth, keypoint):
         diameter = 10
         x, y = map(round, keypoint)
