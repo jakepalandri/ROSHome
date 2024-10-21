@@ -155,6 +155,7 @@ class ReadKinectPose(Node):
         if left_gesture == "none" and right_gesture == "none":
             return
     
+        # 8. Prepare gesture message
         topic = "kinect_pose"
         gesture = "left_arm_" + left_gesture + "_right_arm_" + right_gesture
         if left_gesture == "none":
@@ -164,21 +165,21 @@ class ReadKinectPose(Node):
         
         payload = '{"gesture": "' + gesture + '"}'
         
-        # 8. Send gesture message
-        # 8a. If new gesture, reset timer, needs to be held for 2 frames
+        # 9. Send gesture message
+        # 9a. If new gesture, reset timer, needs to be held for 2 frames
         if self.last_gesture != gesture:
             print("old gesture: " + self.last_gesture + " new gesture: " + gesture)
             self.frames_holding_gesture = 1
             self.last_gesture = gesture
             return
         
-        # 8b. If gesture has been held for less than 2 frames, increment
+        # 9b. If gesture has been held for less than 2 frames, increment
         if self.frames_holding_gesture < 2:
             print("frames holding gesture: " + str(self.frames_holding_gesture))
             self.frames_holding_gesture += 1
             return
         
-        # 8c. Otherwise, send the message
+        # 9c. Otherwise, send the message
         self.client.pub(topic, payload)
         print("sending message: " + payload)
     
