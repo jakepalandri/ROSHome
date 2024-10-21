@@ -196,9 +196,9 @@ class ReadKinectPose(Node):
             gesture = f"right_arm_{right_gesture}"
         elif right_gesture == "none":
             gesture = f"left_arm_{left_gesture}"
-        
+
         payload = f'{{"gesture": "{gesture}"}}'
-        
+
         # 9. Send gesture message
         # 9a. If new gesture, reset timer, needs to be held for 2 frames
         if self.last_gesture != gesture:
@@ -206,13 +206,13 @@ class ReadKinectPose(Node):
             self.frames_holding_gesture = 1
             self.last_gesture = gesture
             return
-        
+
         # 9b. If gesture has been held for less than 2 frames, increment
         if self.frames_holding_gesture < 2:
             print(f"frames holding gesture: {str(self.frames_holding_gesture)}")
             self.frames_holding_gesture += 1
             return
-        
+
         # 9c. Otherwise, send the message
         self.client.pub(topic, payload)
         print(f"sending message: {payload}")
@@ -230,7 +230,7 @@ class ReadKinectPose(Node):
                 gesture = left_gesture
             else:
                 gesture = right_gesture
-        
+
         # 8. store gesture message
         if len(self.gesture_history) < 2:
             self.gesture_history.append({"time": gesture_time, "gesture": gesture})
@@ -248,12 +248,12 @@ class ReadKinectPose(Node):
         # only store the last 10 seconds of gestures
         if len(self.gesture_history) > 40:
             self.gesture_history.pop(0)
-    
+
     def process_speech(self, speech_info):
         # 9. Process speech and get command
         speech_json = json.loads(speech_info.data)
         print(speech_json)
-        
+
         topic = "kinect_pose"
         start_time = speech_json["start_time_ns"]
 
@@ -264,12 +264,10 @@ class ReadKinectPose(Node):
             # for now only going to match exact commands
             if text in self.commands.keys():
                 payload = f'{{"command": "{self.commands[text]}"}}'
-                
                 if "that" in text:
                     payload = f'{{"command": "{self.get_command(option, start_time)}"}}'
-                
                 break
-                
+
         # 10. Send command message
         self.client.pub(topic, payload)
         print(f"sending message: {payload}")
@@ -288,7 +286,7 @@ class ReadKinectPose(Node):
             if diff < max_diff:
                 max_diff = diff
                 closest_gesture = gesture_time["gesture"]
-        
+
         if "light" in option["text"]:
             return f"{closest_gesture}_{self.commands[option['text']]}"
 
@@ -320,17 +318,16 @@ class ReadKinectPose(Node):
         world_coords *= depth
         world_coords[1] *= -1 # make y positive up
         return world_coords
-    
+
     def extend_vector_to_boundary(self, point, vector):
         # Calculate intersection points with each boundary
         t_values = []
-        
+
         for i in range(3):
             if vector[i] != 0:
                 t_min = (self.min[i] - point[i]) / vector[i]
                 t_max = (self.max[i] - point[i]) / vector[i]
                 t_values.extend([t_min, t_max])
-        
 
         t_values = [t for t in t_values if t > 0]
 
@@ -341,7 +338,7 @@ class ReadKinectPose(Node):
         except Exception as e:
             print(f"DEBUG:\n  Point : {np.array2string(point)}\n  Vector: {np.array2string(vector)}")
             raise e
-        
+
         # Find the smallest positive t-value
 
         # Extend the vector to the boundary
@@ -350,10 +347,10 @@ class ReadKinectPose(Node):
         extended_point[np.abs(extended_point) < 0.0001] = 0
 
         return extended_point
-    
+
     def pointing_at(self, origin, vector):
         extended_point = self.extend_vector_to_boundary(origin, vector)
-        
+
         if extended_point[0] == self.min[0]:
             return "right"
         elif extended_point[0] == self.max[0]:
@@ -368,23 +365,17 @@ class ReadKinectPose(Node):
             return "back"
         else:
             return "none"
-    
+
     def vector_is_valid(self, vector):
         return np.isfinite(vector).all() and np.any(vector != 0)
-    
+
     def arm_is_extended(self, distance, threshold):
         return np.isfinite(distance) and distance > threshold
 
 def main(args=None):
     rclpy.init(args=args)
-
     read_kinect_pose = ReadKinectPose()
-
     rclpy.spin(read_kinect_pose)
-
-    # Destroy the node explicitly
-    # (optional - otherwise it will be done automatically
-    # when the garbage collector destroys the node object)
     read_kinect_pose.destroy_node()
     rclpy.shutdown()
 
