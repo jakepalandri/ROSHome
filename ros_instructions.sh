@@ -26,16 +26,24 @@ sr1
 rviz # Open the kinect.rviz config file
 
 # TERMINAL 4:
-sr2
+# sr2
 # ROS2 PROGRAMS
 # rviz2 # Open the kinect2.rviz config file
-# source ~/rviz2_ws/src/install/setup.bash
-srws
+# srws
 # colcon build the package first, ensuring in correct directory
+# ros2 run package executable_name
+sr2
+srws
 cd ~/ROSHome/ros2_ws
 colcon build --packages-select kinect_pose
-# ros2 run package executable_name
 ros2 run kinect_pose listener
 
 # TERMINAL 5:
 mosquitto_sub -v -h localhost -p 1883 -t '#'
+
+# TERMINAL 6:
+sr2
+srws
+cd ~/ROSHome/ros2_ws
+colcon build --packages-select speech_to_text
+ros2 run speech_to_text listener
