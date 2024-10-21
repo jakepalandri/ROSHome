@@ -71,6 +71,8 @@ class ReadKinectPose(Node):
         # self.send_gesture(left_gesture, right_gesture)
         self.store_gesture(left_gesture, right_gesture, left_distance, right_distance, gesture_time)
 
+        self.process_speech(speech)
+
     def determine_gesture(self, depth, rect_matrix, result_keypoint, isPerson):
         if not isPerson:
             return "none", "none", 0, 0
@@ -224,6 +226,10 @@ class ReadKinectPose(Node):
         # it has been more than 250ms since the last gesture this gesture is not closer to the 250ms mark
         else:
             self.gesture_history.append({"time": gesture_time, "gesture": gesture})
+
+        # only store the last 10 seconds of gestures
+        if (len(self.gesture_history) > 40):
+            self.gesture_history.pop(0)
 
     def min_depth(self, depth, keypoint):
         diameter = 10
