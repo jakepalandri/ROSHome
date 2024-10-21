@@ -5,8 +5,10 @@ import torch
 import math
 import numpy as np
 import rclpy
+import json
 from rclpy.node import Node
 from sensor_msgs.msg import Image, CameraInfo
+from std_msgs.msg import String
 from message_filters import TimeSynchronizer, Subscriber
 import numpy as np
 from cv_bridge import CvBridge
@@ -45,9 +47,10 @@ class ReadKinectPose(Node):
         depth_image = Subscriber(self, Image, "/kinect2/hd/image_depth_rect")
         camera_info = Subscriber(self, CameraInfo, "/kinect2/hd/camera_info")
         speech_info = Subscriber(self, String, "/speech_to_text")
+        self.create_subscription(String, '/speech_to_text', self.process_speech, 10)
 
-        self.tss = TimeSynchronizer([color_image, depth_image, camera_info, speech_info], 10)
-        self.tss.registerCallback(self.listener_callback)
+        self.tss = TimeSynchronizer([color_image, depth_image, camera_info], 10)
+        self.tss.registerCallback(self.image_callback)
 
         self.client = MqttClient()
         self.frames_holding_gesture = 0
@@ -73,23 +76,18 @@ class ReadKinectPose(Node):
             "turn that down": "down",
         }
 
-    def listener_callback(self, image, depth, info, speech):
-        # stream          = bridge.imgmsg_to_cv2(image, "bgr8"       )
-        # depth           = bridge.imgmsg_to_cv2(depth, "passthrough")
-        # rect_matrix     = np.array(info.k).reshape(3, 3)
-        # results         = self.model(source=stream, show=True)
-        # gesture_time    = self.get_clock().now().nanoseconds
-        # isPerson        = results[0].keypoints.has_visible
-        # result_keypoint = results[0].keypoints.xy.cpu().numpy()[0]
+    def image_callback(self, image, depth, info):
+        stream          = bridge.imgmsg_to_cv2(image, "bgr8"       )
+        depth           = bridge.imgmsg_to_cv2(depth, "passthrough")
+        rect_matrix     = np.array(info.k).reshape(3, 3)
+        results         = self.model(source=stream, show=True)
+        gesture_time    = self.get_clock().now().nanoseconds
+        isPerson        = results[0].keypoints.has_visible
+        result_keypoint = results[0].keypoints.xy.cpu().numpy()[0]
 
-        # left_gesture,
-        # right_gesture,
-        # left_distance,
-        # right_distance = self.determine_gesture(depth, rect_matrix, result_keypoint, isPerson)
-        # # self.send_gesture(left_gesture, right_gesture)
-        # self.store_gesture(left_gesture, right_gesture, left_distance, right_distance, gesture_time)
-
-        self.process_speech(speech)
+        left_gesture, right_gesture, left_distance, right_distance = self.determine_gesture(depth, rect_matrix, result_keypoint, isPerson)
+        self.store_gesture(left_gesture, right_gesture, left_distance, right_distance, gesture_time)
+        # self.send_gesture(left_gesture, right_gesture)
 
     def determine_gesture(self, depth, rect_matrix, result_keypoint, isPerson):
         if not isPerson:
@@ -218,6 +216,13 @@ class ReadKinectPose(Node):
         print(f"sending message: {payload}")
 
     def store_gesture(self, left_gesture, right_gesture, left_distance, right_distance, gesture_time):
+        # only store the last 10 seconds of gestures
+        self.gesture_history = [gesture for gesture in self.gesture_history if gesture["time"] > gesture_time - 10000000000]
+
+        # don't store if both gestures are none
+        if left_gesture == "none" and right_gesture == "none":
+            return
+
         # 7b. Determine single gesture
         gesture = ""
         if left_gesture != "none" and right_gesture != "none":
@@ -239,15 +244,11 @@ class ReadKinectPose(Node):
         last = self.gesture_history[-1]
         prev = self.gesture_history[-2]
         # new gesture is closer to 250ms since the last gesture
-        if abs(gesture_time - prev.time - 250000000) < abs(last.time - prev.time - 250000000):
+        if abs(gesture_time - prev["time"] - 250000000) < abs(last["time"] - prev["time"] - 250000000):
             self.gesture_history[-1] = {"time": gesture_time, "gesture": gesture}
         # it has been more than 250ms since the last gesture this gesture is not closer to the 250ms mark
         else:
             self.gesture_history.append({"time": gesture_time, "gesture": gesture})
-
-        # only store the last 10 seconds of gestures
-        if len(self.gesture_history) > 40:
-            self.gesture_history.pop(0)
 
     def process_speech(self, speech_info):
         # 9. Process speech and get command
@@ -256,6 +257,8 @@ class ReadKinectPose(Node):
 
         topic = "kinect_pose"
         start_time = speech_json["start_time_ns"]
+        payload = ""
+        send_command = False
 
         for option in speech_json["alternatives"]:
             text = option["text"]
@@ -263,12 +266,16 @@ class ReadKinectPose(Node):
             # we could also match partial sentences with commands
             # for now only going to match exact commands
             if text in self.commands.keys():
+                send_command = True
                 payload = f'{{"command": "{self.commands[text]}"}}'
                 if "that" in text:
                     payload = f'{{"command": "{self.get_command(option, start_time)}"}}'
                 break
 
         # 10. Send command message
+        if not send_command or payload == '{"command": "unknown_command"}':
+            return
+        
         self.client.pub(topic, payload)
         print(f"sending message: {payload}")
 
@@ -276,8 +283,14 @@ class ReadKinectPose(Node):
         that_relative_time = 0
         for word in option["result"]:
             if word["word"] == "that":
-                that_relative_time = word["start"]
+                # add half a second to account for processing delay
+                # 0.5s chosen based on preliminary testing
+                that_relative_time = (word["start"] + 0.5) * 10 ** 9
         that_time = start_time + that_relative_time
+        
+        print(f"that time: {that_time // 10 ** 7 / 100}")
+        for gesture_time in self.gesture_history:
+            print(f"{{    time: {gesture_time['time'] // 10 ** 7 / 100}, gesture: {gesture_time['gesture']}}}")
 
         closest_gesture = ""
         max_diff = math.inf

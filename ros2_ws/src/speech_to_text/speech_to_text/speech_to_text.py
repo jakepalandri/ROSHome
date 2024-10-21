@@ -68,7 +68,7 @@ class VoskSpeechRecognition(Node):
                             result_with_time = json.dumps(result_dict)
 
                             msg = String()
-                            msg.data = result
+                            msg.data = result_with_time
                             self.pub_audio.publish(msg)
                         
                         rec.Reset()
