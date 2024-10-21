@@ -246,7 +246,7 @@ class ReadKinectPose(Node):
             self.gesture_history.append({"time": gesture_time, "gesture": gesture})
 
         # only store the last 10 seconds of gestures
-        if (len(self.gesture_history) > 40):
+        if len(self.gesture_history) > 40:
             self.gesture_history.pop(0)
     
     def process_speech(self, speech_info):
@@ -290,13 +290,13 @@ class ReadKinectPose(Node):
                 closest_gesture = gesture_time["gesture"]
         
         if "light" in option["text"]:
-            return f"{closest_gesture}_{self.commands[option["text"]]}"
+            return f"{closest_gesture}_{self.commands[option['text']]}"
 
-        if (closest_gesture in ["right", "ceiling", "left"]):
-            return f"{closest_gesture}_light_{self.commands[option["text"]]}"
+        if closest_gesture in ["right", "ceiling", "left"]:
+            return f"{closest_gesture}_light_{self.commands[option['text']]}"
 
-        if (closest_gesture = "front"):
-            return f"tv_{self.commands[option["text"]]}"
+        if closest_gesture == "front":
+            return f"tv_{self.commands[option['text']]}"
 
         return "unknown_command"
 
