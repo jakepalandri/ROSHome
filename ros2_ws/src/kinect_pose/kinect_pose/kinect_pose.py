@@ -54,22 +54,40 @@ class ReadKinectPose(Node):
         self.last_gesture = ""
 
         self.gesture_history = []
+        self.commands = {
+            "turn everything on": "all_on",
+            "turn everything off": "all_off",
+            "turn on the tv": "tv_on",
+            "turn off the tv": "tv_off",
+            "turn on the lights": "all_lights_on",
+            "turn off the lights": "all_lights_off",
+            "turn up the volume": "tv_up",
+            "turn down the volume": "tv_down",
+            "turn on that light": "light_on",
+            "turn off that light": "light_off",
+            "turn up that light": "light_up",
+            "turn down that light": "light_down",
+            "turn that on": "on",
+            "turn that off": "off",
+            "turn that up": "up",
+            "turn that down": "down",
+        }
 
     def listener_callback(self, image, depth, info, speech):
-        stream          = bridge.imgmsg_to_cv2(image, "bgr8"       )
-        depth           = bridge.imgmsg_to_cv2(depth, "passthrough")
-        rect_matrix     = np.array(info.k).reshape(3, 3)
-        results         = self.model(source=stream, show=True)
-        gesture_time    = self.get_clock().now().nanoseconds
-        isPerson        = results[0].keypoints.has_visible
-        result_keypoint = results[0].keypoints.xy.cpu().numpy()[0]
+        # stream          = bridge.imgmsg_to_cv2(image, "bgr8"       )
+        # depth           = bridge.imgmsg_to_cv2(depth, "passthrough")
+        # rect_matrix     = np.array(info.k).reshape(3, 3)
+        # results         = self.model(source=stream, show=True)
+        # gesture_time    = self.get_clock().now().nanoseconds
+        # isPerson        = results[0].keypoints.has_visible
+        # result_keypoint = results[0].keypoints.xy.cpu().numpy()[0]
 
-        left_gesture,
-        right_gesture,
-        left_distance,
-        right_distance = self.determine_gesture(depth, rect_matrix, result_keypoint, isPerson)
-        # self.send_gesture(left_gesture, right_gesture)
-        self.store_gesture(left_gesture, right_gesture, left_distance, right_distance, gesture_time)
+        # left_gesture,
+        # right_gesture,
+        # left_distance,
+        # right_distance = self.determine_gesture(depth, rect_matrix, result_keypoint, isPerson)
+        # # self.send_gesture(left_gesture, right_gesture)
+        # self.store_gesture(left_gesture, right_gesture, left_distance, right_distance, gesture_time)
 
         self.process_speech(speech)
 
@@ -173,31 +191,31 @@ class ReadKinectPose(Node):
 
         # 8. Prepare gesture message
         topic = "kinect_pose"
-        gesture = "left_arm_" + left_gesture + "_right_arm_" + right_gesture
+        gesture = f"left_arm_{left_gesture}_right_arm_{right_gesture}"
         if left_gesture == "none":
-            gesture = "right_arm_" + right_gesture
+            gesture = f"right_arm_{right_gesture}"
         elif right_gesture == "none":
-            gesture = "left_arm_" + left_gesture
+            gesture = f"left_arm_{left_gesture}"
         
-        payload = '{"gesture": "' + gesture + '"}'
+        payload = f'{{"gesture": "{gesture}"}}'
         
         # 9. Send gesture message
         # 9a. If new gesture, reset timer, needs to be held for 2 frames
         if self.last_gesture != gesture:
-            print("old gesture: " + self.last_gesture + " new gesture: " + gesture)
+            print(f"old gesture: {self.last_gesture} new gesture: {gesture}")
             self.frames_holding_gesture = 1
             self.last_gesture = gesture
             return
         
         # 9b. If gesture has been held for less than 2 frames, increment
         if self.frames_holding_gesture < 2:
-            print("frames holding gesture: " + str(self.frames_holding_gesture))
+            print(f"frames holding gesture: {str(self.frames_holding_gesture)}")
             self.frames_holding_gesture += 1
             return
         
         # 9c. Otherwise, send the message
         self.client.pub(topic, payload)
-        print("sending message: " + payload)
+        print(f"sending message: {payload}")
 
     def store_gesture(self, left_gesture, right_gesture, left_distance, right_distance, gesture_time):
         # 7b. Determine single gesture
@@ -230,6 +248,57 @@ class ReadKinectPose(Node):
         # only store the last 10 seconds of gestures
         if (len(self.gesture_history) > 40):
             self.gesture_history.pop(0)
+    
+    def process_speech(self, speech_info):
+        # 9. Process speech and get command
+        speech_json = json.loads(speech_info.data)
+        print(speech_json)
+        
+        topic = "kinect_pose"
+        start_time = speech_json["start_time_ns"]
+
+        for option in speech_json["alternatives"]:
+            text = option["text"]
+            # we could use a regex to match the text
+            # we could also match partial sentences with commands
+            # for now only going to match exact commands
+            if text in self.commands.keys():
+                payload = f'{{"command": "{self.commands[text]}"}}'
+                
+                if "that" in text:
+                    payload = f'{{"command": "{self.get_command(option, start_time)}"}}'
+                
+                break
+                
+        # 10. Send command message
+        self.client.pub(topic, payload)
+        print(f"sending message: {payload}")
+
+    def get_command(self, option, start_time):
+        that_relative_time = 0
+        for word in option["result"]:
+            if word["word"] == "that":
+                that_relative_time = word["start"]
+        that_time = start_time + that_relative_time
+
+        closest_gesture = ""
+        max_diff = math.inf
+        for gesture_time in self.gesture_history:
+            diff = abs(gesture_time["time"] - that_time)
+            if diff < max_diff:
+                max_diff = diff
+                closest_gesture = gesture_time["gesture"]
+        
+        if "light" in option["text"]:
+            return f"{closest_gesture}_{self.commands[option["text"]]}"
+
+        if (closest_gesture in ["right", "ceiling", "left"]):
+            return f"{closest_gesture}_light_{self.commands[option["text"]]}"
+
+        if (closest_gesture = "front"):
+            return f"tv_{self.commands[option["text"]]}"
+
+        return "unknown_command"
 
     def min_depth(self, depth, keypoint):
         diameter = 10
@@ -270,7 +339,7 @@ class ReadKinectPose(Node):
         try:
             t_min = min(t_values)
         except Exception as e:
-            print("DEBUG:\n  Point : " +  np.array2string(point) + "\n  Vector: " + np.array2string(vector))
+            print(f"DEBUG:\n  Point : {np.array2string(point)}\n  Vector: {np.array2string(vector)}")
             raise e
         
         # Find the smallest positive t-value
