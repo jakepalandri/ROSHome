@@ -6,6 +6,7 @@ import math
 import numpy as np
 import rclpy
 import json
+from playsound import playsound
 from rclpy.node import Node
 from sensor_msgs.msg import Image, CameraInfo
 from std_msgs.msg import String
@@ -259,9 +260,13 @@ class ReadKinectPose(Node):
         start_time = speech_json["start_time_ns"]
         payload = ""
         send_command = False
+        starts_with_home = False
 
         for option in speech_json["alternatives"]:
             text = option["text"]
+            if text.startswith("home"):
+                starts_with_home = True
+                text = text[5:]
             # we could use a regex to match the text
             # we could also match partial sentences with commands
             # for now only going to match exact commands
@@ -274,6 +279,8 @@ class ReadKinectPose(Node):
 
         # 10. Send command message
         if not send_command or payload == '{"command": "unknown_command"}':
+            if starts_with_home:
+                self.respond()
             return
         
         self.client.pub(topic, payload)
@@ -324,6 +331,9 @@ class ReadKinectPose(Node):
                     if d != 0 and d < min_depth:
                         min_depth = d
         return min_depth
+
+    def respond(self):
+        playsound("response.mp3")
 
     def pixel_to_world(self, pixel, rect_matrix, depth):
         pixel_homogeneous = np.array([pixel[0], pixel[1], 1])

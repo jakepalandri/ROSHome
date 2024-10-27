@@ -266,7 +266,8 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
 # Thesis C TODOs
 - [x] Timing commands with gestures
 - [x] Alternative interpretations of speech for commands
-- [ ] Response when command not recognised
+- [x] Response when command not recognised
+- [x] Wake word
 - [ ] Pattern matching for commands
 - [ ] User can upload their own commands
 
