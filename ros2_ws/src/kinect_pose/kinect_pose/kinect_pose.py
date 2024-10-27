@@ -58,22 +58,22 @@ class ReadKinectPose(Node):
 
         self.gesture_history = []
         self.commands = {
-            "turn everything on": "all_on",
-            "turn everything off": "all_off",
-            "turn on the tv": "tv_on",
-            "turn off the tv": "tv_off",
-            "turn on the lights": "all_lights_on",
-            "turn off the lights": "all_lights_off",
-            "turn up the volume": "tv_up",
+            "turn everything on"  : "all_on",
+            "turn everything off" : "all_off",
+            "turn on the tv"      : "tv_on",
+            "turn off the tv"     : "tv_off",
+            "turn on the lights"  : "all_lights_on",
+            "turn off the lights" : "all_lights_off",
+            "turn up the volume"  : "tv_up",
             "turn down the volume": "tv_down",
-            "turn on that light": "light_on",
-            "turn off that light": "light_off",
-            "turn up that light": "light_up",
+            "turn on that light"  : "light_on",
+            "turn off that light" : "light_off",
+            "turn up that light"  : "light_up",
             "turn down that light": "light_down",
-            "turn that on": "on",
-            "turn that off": "off",
-            "turn that up": "up",
-            "turn that down": "down",
+            "turn that on"        : "on",
+            "turn that off"       : "off",
+            "turn that up"        : "up",
+            "turn that down"      : "down",
         }
 
     def image_callback(self, image, depth, info):
@@ -168,9 +168,9 @@ class ReadKinectPose(Node):
             left_distance  = left_shldr_distance
             right_distance = right_shldr_distance
             threshold = shldr_threshold
-            # print("Using shoulder dist")
+        #     print("Using shoulder dist")
         # else:
-            # print("Using hip dist")
+        #     print("Using hip dist")
 
         # 7. Determine user's gesture
         left_gesture = "none"
@@ -287,7 +287,7 @@ class ReadKinectPose(Node):
                 # 0.5s chosen based on preliminary testing
                 that_relative_time = (word["start"] + 0.5) * 10 ** 9
         that_time = start_time + that_relative_time
-        
+
         print(f"that time: {that_time // 10 ** 7 / 100}")
         for gesture_time in self.gesture_history:
             print(f"{{    time: {gesture_time['time'] // 10 ** 7 / 100}, gesture: {gesture_time['gesture']}}}")
