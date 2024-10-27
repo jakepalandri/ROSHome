@@ -261,3 +261,18 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
     - Devices
 - Privacy and Cyber security risks
     - Solved by having local computation
+
+
+# Thesis C TODOs
+- [x] Timing commands with gestures
+- [x] Alternative interpretations of speech for commands
+- [ ] Response when command not recognised
+- [ ] Pattern matching for commands
+- [ ] User can upload their own commands
+
+# Report
+- Future plan
+
+- Appendix:
+    - user manual
+    - how to use, etc.
