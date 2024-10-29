@@ -8,22 +8,48 @@
         <!-- Bootstrap CSS -->
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     </head>
-    <body class="d-flex justify-content-center align-items-center vh-100 bg-dark text-light">
-        <div id="app" class="container text-center">
-            <h1 class="mb-4">Add New Command</h1>
-            <form id="commandForm">
-                <div class="form-group">
-                    <label for="command">Voice Command:</label>
-                    <input type="text" id="command" name="command" class="form-control bg-dark text-light" required>
-                </div>
-                <div class="form-group">
-                    <label for="action">Action:</label>
-                    <input type="text" id="action" name="action" class="form-control bg-dark text-light" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Add Command</button>
-            </form>
-            <p id="message" class="mt-3 text-light"></p>
+    <body class="bg-dark text-light">
+        <div class="container my-5">
+            <h1 class="text-center">Smart Home Command Interface</h1>
+        
+            <!-- Toggle Button -->
+            <button id="toggleButton" class="btn btn-secondary mb-4">View Commands</button>
+        
+            <!-- "Add Commands" Form -->
+            <div id="addCommandsDiv" class="container text-center" style="display:block">
+                <h2 class="mb-4">Add New Command</h2>
+                <form id="commandForm">
+                    <div class="form-group">
+                        <label for="command">Voice Command:</label>
+                        <input type="text" id="command" name="command" class="form-control bg-dark text-light" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="action">Action:</label>
+                        <input type="text" id="action" name="action" class="form-control bg-dark text-light" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Command</button>
+                </form>
+                <p id="message" class="mt-3 text-light"></p>
+            </div>
+      
+            <!-- "View/Remove Commands" Section -->
+            <div id="viewRemoveCommandsDiv" class="container text-center" style="display: none;">
+                <h2>Available Commands</h2>
+                <table id="commandTable" class="table table-dark">
+                    <thead>
+                      <tr>
+                        <th>Voice Command</th>
+                        <th>Command Value</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="commandList">
+                      <!-- Command rows will be inserted here -->
+                    </tbody>
+                  </table>
+            </div>
         </div>
+      
         <script src="../dist/main.js"></script>
-    </body>
+      </body>
 </html>
