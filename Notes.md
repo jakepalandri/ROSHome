@@ -277,3 +277,4 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
 - Appendix:
     - user manual
     - how to use, etc.
+    - extensive detail on setup and running
