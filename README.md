@@ -1,5 +1,5 @@
 # ROSHome
-Home Automation using ROS and Kinect Sensors
+Home Automation using ROS and Kinect Sensors in conjunction with voice commands
 
 Run the instructions in `install.sh` line by line, do not run the bash script. At this point in time it does not work.
 
