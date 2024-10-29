@@ -6,6 +6,8 @@ import math
 import numpy as np
 import rclpy
 import json
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 from playsound import playsound
 from rclpy.node import Node
 from sensor_msgs.msg import Image, CameraInfo
@@ -57,24 +59,12 @@ class ReadKinectPose(Node):
         self.last_gesture = ""
 
         self.gesture_history = []
-        self.commands = {
-            "turn everything on"  : "all_on",
-            "turn everything off" : "all_off",
-            "turn on the tv"      : "tv_on",
-            "turn off the tv"     : "tv_off",
-            "turn on the lights"  : "all_lights_on",
-            "turn off the lights" : "all_lights_off",
-            "turn up the volume"  : "tv_up",
-            "turn down the volume": "tv_down",
-            "turn on that light"  : "light_on",
-            "turn off that light" : "light_off",
-            "turn up that light"  : "light_up",
-            "turn down that light": "light_down",
-            "turn that on"        : "on",
-            "turn that off"       : "off",
-            "turn that up"        : "up",
-            "turn that down"      : "down",
-        }
+        self.load_commands()
+        
+        event_handler = CommandFileHandler(self)
+        observer = Observer()
+        observer.schedule(event_handler, path="assets/commands.json", recursive=False)
+        observer.start()
 
     def image_callback(self, image, depth, info):
         stream          = bridge.imgmsg_to_cv2(image, "bgr8"       )
@@ -317,6 +307,14 @@ class ReadKinectPose(Node):
 
         return "unknown_command"
 
+    def respond(self):
+        playsound("assets/response.mp3")
+
+    def load_commands(self):
+        with open("assets/commands.json", "r") as f:
+            self.commands = json.load(f)
+        print("Commands reloaded:", self.commands)
+
     def min_depth(self, depth, keypoint):
         diameter = 10
         x, y = map(round, keypoint)
@@ -330,9 +328,6 @@ class ReadKinectPose(Node):
                     if d != 0 and d < min_depth:
                         min_depth = d
         return min_depth
-
-    def respond(self):
-        playsound("assets/response.mp3")
 
     def pixel_to_world(self, pixel, rect_matrix, depth):
         pixel_homogeneous = np.array([pixel[0], pixel[1], 1])
@@ -393,6 +388,14 @@ class ReadKinectPose(Node):
 
     def arm_is_extended(self, distance, threshold):
         return np.isfinite(distance) and distance > threshold
+
+class CommandFileHandler(FileSystemEventHandler):
+    def __init__(self, node):
+        self.node = node
+
+    def on_modified(self, event):
+        if event.src_path.endswith("commands.json"):
+            self.node.load_commands()
 
 def main(args=None):
     rclpy.init(args=args)
