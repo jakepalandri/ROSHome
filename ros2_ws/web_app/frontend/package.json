@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "Web interface for adding/removing voice commands to ROS node",
   "main": "src/main.ts",
-  "dependencies": {
-    "bootstrap": "^5.3.3"
-  },
+  "dependencies": {},
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

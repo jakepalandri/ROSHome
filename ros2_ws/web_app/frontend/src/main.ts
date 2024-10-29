@@ -42,6 +42,7 @@ async function loadCommands() {
             // Create and set command value cell
             const valueCell = document.createElement("td");
             valueCell.textContent = commands[command];
+            if (commands[command].includes("that")) valueCell.textContent = `[gesture]_${commands[command]}`;
             row.appendChild(valueCell);
       
             // Create actions cell with delete button
