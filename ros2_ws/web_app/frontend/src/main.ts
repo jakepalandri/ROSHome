@@ -3,8 +3,8 @@ document.getElementById("commandForm")!.addEventListener("submit", async (event)
     
     const command = (document.getElementById("command") as HTMLInputElement).value;
     const action = (document.getElementById("action") as HTMLInputElement).value;
-    // const backendURL = "http://192.168.0.100:5000"; // on lab router network
-    const backendURL = "http://192.168.0.186:5000"; // on home network
+    const backendURL = "http://192.168.0.100:5000"; // on lab router network
+    // const backendURL = "http://192.168.0.186:5000"; // on home network
 
     try {
         const response = await fetch(`${backendURL}/add-command`, {
