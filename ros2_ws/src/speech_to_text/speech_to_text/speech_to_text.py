@@ -17,7 +17,7 @@ class VoskSpeechRecognition(Node):
         super().__init__("vosk_speech_recognition")
         self.pub_audio = self.create_publisher(String, '/speech_to_text', 10)
 
-        model_path = "/home/jake/ROSHome/ros2_ws/models/vosk-model-en-us-0.42-gigaspeech"
+        model_path = "/home/jake/ROSHome/ros2_ws/assets/models/vosk-model-en-us-0.42-gigaspeech"
         self.q = queue.Queue()
  
         self.input_dev_num = sd.query_hostapis()[0]['default_input_device']

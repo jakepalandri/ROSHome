@@ -42,7 +42,7 @@ class ReadKinectPose(Node):
         self.min = [-2500, -1000, 0000]
         self.max = [ 2500,  3000, 5000]
 
-        self.model = YOLO("yolov8m-pose.pt")
+        self.model = YOLO("assets/models/yolov8m-pose.pt")
         self.model = self.model.to("cuda" if torch.cuda.is_available() else "cpu")
 
         # using HD camera, needs calibrating
@@ -63,7 +63,7 @@ class ReadKinectPose(Node):
         
         event_handler = CommandFileHandler(self)
         observer = Observer()
-        observer.schedule(event_handler, path="assets/commands.json", recursive=False)
+        observer.schedule(event_handler, path="assets/json/commands.json", recursive=False)
         observer.start()
 
     def image_callback(self, image, depth, info):
@@ -308,10 +308,10 @@ class ReadKinectPose(Node):
         return "unknown_command"
 
     def respond(self):
-        playsound("assets/response.mp3")
+        playsound("assets/audio/response.mp3")
 
     def load_commands(self):
-        with open("assets/commands.json", "r") as f:
+        with open("assets/json/commands.json", "r") as f:
             self.commands = json.load(f)
         print("Commands reloaded:", self.commands)
 
