@@ -332,7 +332,7 @@ class ReadKinectPose(Node):
         return min_depth
 
     def respond(self):
-        playsound("response.mp3")
+        playsound("assets/response.mp3")
 
     def pixel_to_world(self, pixel, rect_matrix, depth):
         pixel_homogeneous = np.array([pixel[0], pixel[1], 1])
