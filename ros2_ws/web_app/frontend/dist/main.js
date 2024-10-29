@@ -90,6 +90,8 @@ function loadCommands() {
                         // Create and set command value cell
                         var valueCell = document.createElement("td");
                         valueCell.textContent = commands_1[command];
+                        if (command.includes("that"))
+                            valueCell.textContent = "[gesture]_" + commands_1[command];
                         row.appendChild(valueCell);
                         // Create actions cell with delete button
                         var actionsCell = document.createElement("td");
