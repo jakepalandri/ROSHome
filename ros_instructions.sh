@@ -47,3 +47,12 @@ srws
 cd ~/ROSHome/ros2_ws
 colcon build --packages-select speech_to_text
 ros2 run speech_to_text listener
+
+# TERMINAL 7:
+cd ~/ROSHome/ros2_ws/web_app/backend
+python3 web_server.py
+
+# TERMINAL 8:
+cd ~/ROSHome/ros2_ws/web_app/frontend
+tsc
+live-server

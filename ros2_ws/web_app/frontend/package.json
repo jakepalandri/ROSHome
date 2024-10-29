@@ -1,0 +1,31 @@
+{
+  "name": "web_app",
+  "version": "1.0.0",
+  "description": "Web interface for adding/removing voice commands to ROS node",
+  "main": "src/main.ts",
+  "dependencies": {
+    "bootstrap": "^5.3.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/jakepalandri/ROSHome.git"
+  },
+  "keywords": [
+    "ROS",
+    "web app",
+    "home automation",
+    "smart home",
+    "speech recognition",
+    "commands"
+  ],
+  "author": "Jake Palandri",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jakepalandri/ROSHome/issues"
+  },
+  "homepage": "https://github.com/jakepalandri/ROSHome#readme"
+}

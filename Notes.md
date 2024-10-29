@@ -269,7 +269,7 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
 - [x] Response when command not recognised
 - [x] Wake word
 - [ ] Pattern matching for commands
-- [ ] User can upload their own commands
+- [x] User can upload their own commands
 
 # Report
 - Future plan
