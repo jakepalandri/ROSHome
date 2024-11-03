@@ -268,9 +268,22 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
 - [x] Alternative interpretations of speech for commands
 - [x] Response when command not recognised
 - [x] Wake word
-- [ ] Pattern matching for commands (Regex?)
 - [x] User can upload their own commands
 - [x] More detail in frontend
+- [ ] Pattern matching for commands
+    - Plan for this:
+    - User enters a device type
+    - User enters a list of possible voice commands
+    - User enters a matching list of device commands
+    - This is all added to the JSON
+    - In Python:
+        - The wake word is matched
+        - The list of commands / the device type is matched against
+        - The word "all" and "every" with the plural of the device type
+        - Or check for the word "that" with the singular of the device type and check for a gesture
+        - Anything is allowed between the command and device type
+        - Nothing is allowed between the words within the command and within the device type
+        - The matching command is sent to Home Assistant, e.g. right_light.turn_on
 
 # Report
 - Abstract
