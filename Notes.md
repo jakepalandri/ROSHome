@@ -268,13 +268,20 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
 - [x] Alternative interpretations of speech for commands
 - [x] Response when command not recognised
 - [x] Wake word
-- [ ] Pattern matching for commands
+- [ ] Pattern matching for commands (Regex?)
 - [x] User can upload their own commands
+- [ ] More detail in frontend
 
 # Report
-- Future plan
-
-- Appendix:
-    - user manual
-    - how to use, etc.
-    - extensive detail on setup and running
+- Abstract
+- Ch1 introduction
+- Ch2 lit review w updates
+- Ch3 methodology talk abt ros and how devices interfacem speech tools etc.
+- Ch4 evaluation and photos - important - what worked and didnt
+- Ch5 conclusion and future work - how to improve, extension work, what would you do differently
+- References
+- Appendix
+    - User manual
+        - Extensive detail on setup and running
+        - Incl. dependencies (see if i can do it myself on another device)
+    - JSON commands
