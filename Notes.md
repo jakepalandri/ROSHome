@@ -279,11 +279,14 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
     - In Python:
         - The wake word is matched
         - The list of commands / the device type is matched against
+        - EVERY device type is checked and the one with the latest match in the sentence is matched with
+            - this is because users could potentially be correcting themselves mid sentence and avoids matching with "" unless that is the only match
         - The word "all" and "every" with the plural of the device type
         - Or check for the word "that" with the singular of the device type and check for a gesture
         - Anything is allowed between the command and device type
         - Nothing is allowed between the words within the command and within the device type
         - The matching command is sent to Home Assistant, e.g. right_light.turn_on
+        - Should there be a hard coded turn everything on/off?
 
 # Report
 - Abstract
