@@ -274,7 +274,6 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
     - Plan for this:
     - User enters a device type
     - User enters a list of possible voice commands
-    - User enters a matching list of device commands
     - This is all added to the JSON
     - In Python:
         - The wake word is matched
