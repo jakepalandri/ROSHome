@@ -270,7 +270,7 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
 - [x] Wake word
 - [ ] Pattern matching for commands (Regex?)
 - [x] User can upload their own commands
-- [ ] More detail in frontend
+- [x] More detail in frontend
 
 # Report
 - Abstract

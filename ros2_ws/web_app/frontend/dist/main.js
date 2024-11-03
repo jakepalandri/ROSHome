@@ -36,15 +36,19 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 // Variables
-var backendURL = "http://192.168.0.100:5000"; // on lab router network
-// const backendURL = "http://192.168.0.186:5000"; // on home network
+// const backendURL = "http://192.168.0.100:5000"; // on lab router network
+var backendURL = "http://192.168.0.162:5000"; // on home network
 var toggleButton = document.getElementById("toggleButton");
 var addCommandsDiv = document.getElementById("addCommandsDiv");
 var viewRemoveCommandsDiv = document.getElementById("viewRemoveCommandsDiv");
+var thatKeyword = document.getElementById("thatKeyword");
+var commandForm = document.getElementById("commandForm");
 var commandList = document.getElementById("commandList");
 var commandInput = document.getElementById("command");
 var actionInput = document.getElementById("action");
-loadCommands();
+var submissionText = document.getElementById("submission");
+var submissionButton = document.getElementById("submit");
+var message = document.getElementById("message");
 toggleButton.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
     var addCommandsVisible;
     return __generator(this, function (_a) {
@@ -55,8 +59,6 @@ toggleButton.addEventListener("click", function () { return __awaiter(void 0, vo
                 viewRemoveCommandsDiv.style.display = addCommandsVisible ? "block" : "none";
                 // Update button text
                 toggleButton.textContent = addCommandsVisible ? "Add Commands" : "View Commands";
-                commandInput.value = "";
-                actionInput.value = "";
                 return [4 /*yield*/, loadCommands()];
             case 1:
                 _a.sent();
@@ -65,96 +67,109 @@ toggleButton.addEventListener("click", function () { return __awaiter(void 0, vo
     });
 }); });
 // Load commands from backend and display them in the list
-function loadCommands() {
-    return __awaiter(this, void 0, void 0, function () {
-        var response, commands_1, error_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 3, , 4]);
-                    return [4 /*yield*/, fetch(backendURL + "/api/commands")];
-                case 1:
-                    response = _a.sent();
-                    if (!response.ok)
-                        throw new Error("Error fetching commands: " + response.statusText);
-                    return [4 /*yield*/, response.json()];
-                case 2:
-                    commands_1 = _a.sent();
-                    commandList.innerHTML = ''; // Clear current list
-                    Object.keys(commands_1).forEach(function (command) {
-                        var row = document.createElement("tr");
-                        // Create and set command key cell
-                        var keyCell = document.createElement("td");
-                        keyCell.textContent = command;
-                        row.appendChild(keyCell);
-                        // Create and set command value cell
-                        var valueCell = document.createElement("td");
-                        valueCell.textContent = commands_1[command];
-                        if (command.includes("that"))
-                            valueCell.textContent = "[gesture]_" + commands_1[command];
-                        row.appendChild(valueCell);
-                        // Create actions cell with delete button
-                        var actionsCell = document.createElement("td");
-                        var deleteButton = document.createElement("button");
-                        deleteButton.className = "btn btn-danger btn-sm";
-                        deleteButton.textContent = "Delete";
-                        deleteButton.onclick = function () { return deleteCommand(command); };
-                        actionsCell.appendChild(deleteButton);
-                        row.appendChild(actionsCell);
-                        // Append the row to the command list
-                        commandList.appendChild(row);
-                    });
-                    return [3 /*break*/, 4];
-                case 3:
-                    error_1 = _a.sent();
-                    console.error(error_1);
-                    commandList.innerHTML = "<li class=\"list-group-item text-danger bg-dark text-light\">Failed to load commands</li>";
-                    return [3 /*break*/, 4];
-                case 4: return [2 /*return*/];
-            }
-        });
+var loadCommands = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var response, commands_1, error_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, fetch(backendURL + "/api/commands")];
+            case 1:
+                response = _a.sent();
+                if (!response.ok)
+                    throw new Error("Error fetching commands: " + response.statusText);
+                return [4 /*yield*/, response.json()];
+            case 2:
+                commands_1 = _a.sent();
+                commandList.innerHTML = ''; // Clear current list
+                Object.keys(commands_1).forEach(function (command) {
+                    var row = document.createElement("tr");
+                    // Create and set command key cell
+                    var keyCell = document.createElement("td");
+                    keyCell.textContent = command;
+                    row.appendChild(keyCell);
+                    // Create and set command value cell
+                    var valueCell = document.createElement("td");
+                    valueCell.textContent = commands_1[command];
+                    if (command.includes("that"))
+                        valueCell.textContent = "[gesture]_" + commands_1[command];
+                    row.appendChild(valueCell);
+                    // Create actions cell with delete button
+                    var actionsCell = document.createElement("td");
+                    var deleteButton = document.createElement("button");
+                    deleteButton.className = "btn btn-danger btn-sm";
+                    deleteButton.textContent = "Delete";
+                    deleteButton.onclick = function () { return deleteCommand(command); };
+                    actionsCell.appendChild(deleteButton);
+                    row.appendChild(actionsCell);
+                    // Append the row to the command list
+                    commandList.appendChild(row);
+                });
+                return [3 /*break*/, 4];
+            case 3:
+                error_1 = _a.sent();
+                console.error(error_1);
+                commandList.innerHTML = "<li class=\"list-group-item text-danger bg-dark text-light\">Failed to load commands</li>";
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
     });
-}
+}); };
+// Set submission text and enable/disable submission button to confirm values to the user
+var setSubmissionText = function () {
+    if (commandInput.value !== "" && actionInput.value !== "") {
+        submissionText.innerHTML = "Command: " + commandInput.value + " <br>";
+        if (commandInput.value.includes("that")) {
+            submissionText.innerHTML += "Action: [gesture]_" + actionInput.value;
+        }
+        else {
+            submissionText.innerHTML += "Action: " + actionInput.value;
+        }
+        submissionButton.disabled = false;
+    }
+    else {
+        submissionText.innerHTML = "";
+        submissionButton.disabled = true;
+    }
+};
 // Function to delete a command
-function deleteCommand(commandKey) {
-    return __awaiter(this, void 0, void 0, function () {
-        var response, error_2;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 3, , 4]);
-                    return [4 /*yield*/, fetch(backendURL + "/api/commands/" + commandKey, {
-                            method: 'DELETE',
-                        })];
-                case 1:
-                    response = _a.sent();
-                    if (!response.ok)
-                        throw new Error("Failed to delete command: " + response.statusText);
-                    // Reload commands after successful deletion
-                    return [4 /*yield*/, loadCommands()];
-                case 2:
-                    // Reload commands after successful deletion
-                    _a.sent();
-                    return [3 /*break*/, 4];
-                case 3:
-                    error_2 = _a.sent();
-                    console.error(error_2);
-                    alert("Error deleting command: " + commandKey);
-                    return [3 /*break*/, 4];
-                case 4: return [2 /*return*/];
-            }
-        });
+var deleteCommand = function (commandKey) { return __awaiter(void 0, void 0, void 0, function () {
+    var response, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 3, , 4]);
+                return [4 /*yield*/, fetch(backendURL + "/api/commands/" + commandKey, {
+                        method: 'DELETE',
+                    })];
+            case 1:
+                response = _a.sent();
+                if (!response.ok)
+                    throw new Error("Failed to delete command: " + response.statusText);
+                // Reload commands after successful deletion
+                return [4 /*yield*/, loadCommands()];
+            case 2:
+                // Reload commands after successful deletion
+                _a.sent();
+                return [3 /*break*/, 4];
+            case 3:
+                error_2 = _a.sent();
+                console.error(error_2);
+                alert("Error deleting command: " + commandKey);
+                return [3 /*break*/, 4];
+            case 4: return [2 /*return*/];
+        }
     });
-}
+}); };
 // Add command form submission
-document.getElementById("commandForm").addEventListener("submit", function (event) { return __awaiter(void 0, void 0, void 0, function () {
+commandForm.addEventListener("submit", function (event) { return __awaiter(void 0, void 0, void 0, function () {
     var command, action, response, error_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 event.preventDefault();
-                command = document.getElementById("command").value;
-                action = document.getElementById("action").value;
+                command = commandInput.value;
+                action = actionInput.value;
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 6, , 7]);
@@ -168,7 +183,7 @@ document.getElementById("commandForm").addEventListener("submit", function (even
             case 2:
                 response = _a.sent();
                 if (!response.ok) return [3 /*break*/, 4];
-                document.getElementById("message").innerText = "Command added successfully!";
+                message.innerText = "Command added successfully!";
                 commandInput.value = "";
                 actionInput.value = "";
                 return [4 /*yield*/, loadCommands()];
@@ -176,14 +191,27 @@ document.getElementById("commandForm").addEventListener("submit", function (even
                 _a.sent();
                 return [3 /*break*/, 5];
             case 4:
-                document.getElementById("message").innerText = "Failed to add command.";
+                message.innerText = "Failed to add command.";
                 _a.label = 5;
             case 5: return [3 /*break*/, 7];
             case 6:
                 error_3 = _a.sent();
-                document.getElementById("message").innerText = "Error: Could not connect to server.";
+                message.innerText = "Error: Could not connect to server.";
                 return [3 /*break*/, 7];
             case 7: return [2 /*return*/];
         }
     });
 }); });
+commandInput.addEventListener("input", setSubmissionText);
+actionInput.addEventListener("input", setSubmissionText);
+commandInput.addEventListener("input", function () {
+    if (commandInput.value.includes("that")) {
+        thatKeyword.style.color = "lightgreen";
+    }
+    else {
+        thatKeyword.style.color = "white";
+    }
+});
+// run these on load
+loadCommands();
+setSubmissionText();
