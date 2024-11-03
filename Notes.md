@@ -274,11 +274,20 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
 
 # Report
 - Abstract
-- Ch1 introduction
-- Ch2 lit review w updates
-- Ch3 methodology talk abt ros and how devices interfacem speech tools etc.
-- Ch4 evaluation and photos - important - what worked and didnt
-- Ch5 conclusion and future work - how to improve, extension work, what would you do differently
+- **Ch1** Introduction
+- **Ch2** Literature Review
+    - Copy + paste literature review from Thesis A
+    - Update existing literature review
+        - Voice commands, etc.
+- **Ch3** Methodology
+    - Talk about ROS and how devices interface, speech tools, models etc.
+- **Ch4** Evaluation
+    - Incl. photos
+    - What worked and what didn't?
+- **Ch5** Conclusion and Future Work
+    - How to improve
+    - Extension work
+    - What would you do differently?
 - References
 - Appendix
     - User manual
