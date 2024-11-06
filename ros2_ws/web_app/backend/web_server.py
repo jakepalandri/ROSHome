@@ -30,18 +30,18 @@ def delete_command(command):
     if command in commands:
         del commands[command]
         save_commands(commands)
-        return jsonify({"message": f"Command '{command}' removed successfully"}), 200
+        return jsonify({"message": f"Device type '{command}' removed successfully"}), 200
     else:
         return jsonify({"error": "Command not found"}), 404
 
 @app.route('/add-command', methods=['POST'])
 def add_command():
     data = request.get_json()
-    command = data.get('command')
-    action = data.get('action')
+    deviceType = data.get('deviceType')
+    commandsList = data.get('commands')
 
     commands = load_commands()
-    commands[command.lower()] = action.lower()
+    commands[deviceType.lower()] = commandsList
     save_commands(commands)
 
     return jsonify({"status": "success"})

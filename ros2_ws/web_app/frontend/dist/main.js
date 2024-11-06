@@ -36,19 +36,21 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 // Variables
-// const backendURL = "http://192.168.0.100:5000"; // on lab router network
-var backendURL = "http://192.168.0.162:5000"; // on home network
+var backendURL = "http://192.168.0.100:5000"; // on lab router network
+// const backendURL = "http://192.168.0.162:5000"; // on home network
 var toggleButton = document.getElementById("toggleButton");
 var addCommandsDiv = document.getElementById("addCommandsDiv");
-var viewRemoveCommandsDiv = document.getElementById("viewRemoveCommandsDiv");
-var thatKeyword = document.getElementById("thatKeyword");
+var viewCommandsDiv = document.getElementById("viewCommandsDiv");
 var commandForm = document.getElementById("commandForm");
+var inputContainer = document.getElementById("inputContainer");
+var deviceTypeInput = document.getElementById("deviceType");
+var firstCommandInput = document.getElementById("command0");
+var addButton = document.getElementById("addButton");
 var commandList = document.getElementById("commandList");
-var commandInput = document.getElementById("command");
-var actionInput = document.getElementById("action");
 var submissionText = document.getElementById("submission");
 var submissionButton = document.getElementById("submit");
 var message = document.getElementById("message");
+var inputCount = 1;
 toggleButton.addEventListener("click", function () { return __awaiter(void 0, void 0, void 0, function () {
     var addCommandsVisible;
     return __generator(this, function (_a) {
@@ -56,7 +58,7 @@ toggleButton.addEventListener("click", function () { return __awaiter(void 0, vo
             case 0:
                 addCommandsVisible = addCommandsDiv.style.display === "block";
                 addCommandsDiv.style.display = addCommandsVisible ? "none" : "block";
-                viewRemoveCommandsDiv.style.display = addCommandsVisible ? "block" : "none";
+                viewCommandsDiv.style.display = addCommandsVisible ? "block" : "none";
                 // Update button text
                 toggleButton.textContent = addCommandsVisible ? "Add Commands" : "View Commands";
                 return [4 /*yield*/, loadCommands()];
@@ -89,15 +91,21 @@ var loadCommands = function () { return __awaiter(void 0, void 0, void 0, functi
                     keyCell.textContent = command;
                     row.appendChild(keyCell);
                     // Create and set command value cell
-                    var valueCell = document.createElement("td");
-                    valueCell.textContent = commands_1[command];
-                    if (command.includes("that"))
-                        valueCell.textContent = "[gesture]_" + commands_1[command];
-                    row.appendChild(valueCell);
+                    var valuesCell = document.createElement("td");
+                    commands_1[command].forEach(function (value) {
+                        valuesCell.innerHTML += value + "<br/>";
+                    });
+                    row.appendChild(valuesCell);
                     // Create actions cell with delete button
                     var actionsCell = document.createElement("td");
+                    actionsCell.style.alignItems = "center";
+                    var modifyButton = document.createElement("button");
+                    modifyButton.className = "btn btn-primary btn-sm modify-button";
+                    modifyButton.textContent = "Modify";
+                    modifyButton.onclick = function () { return modifyCommand(command, commands_1[command]); };
+                    actionsCell.appendChild(modifyButton);
                     var deleteButton = document.createElement("button");
-                    deleteButton.className = "btn btn-danger btn-sm";
+                    deleteButton.className = "btn btn-danger btn-sm delete-button";
                     deleteButton.textContent = "Delete";
                     deleteButton.onclick = function () { return deleteCommand(command); };
                     actionsCell.appendChild(deleteButton);
@@ -115,22 +123,36 @@ var loadCommands = function () { return __awaiter(void 0, void 0, void 0, functi
         }
     });
 }); };
-// Set submission text and enable/disable submission button to confirm values to the user
-var setSubmissionText = function () {
-    if (commandInput.value !== "" && actionInput.value !== "") {
-        submissionText.innerHTML = "Command: " + commandInput.value + " <br>";
-        if (commandInput.value.includes("that")) {
-            submissionText.innerHTML += "Action: [gesture]_" + actionInput.value;
-        }
-        else {
-            submissionText.innerHTML += "Action: " + actionInput.value;
-        }
-        submissionButton.disabled = false;
-    }
-    else {
-        submissionText.innerHTML = "";
-        submissionButton.disabled = true;
-    }
+// // Set submission text and enable/disable submission button to confirm values to the user
+// const setSubmissionText = () => {
+//     if (commandInput.value !== "" && actionInput.value !== "") {
+//         submissionText.innerHTML = `Command: ${commandInput.value} <br>`;
+//         if (commandInput.value.includes("that")) {
+//             submissionText.innerHTML += `Action: [gesture]_${actionInput.value}`;
+//         }
+//         else {
+//             submissionText.innerHTML += `Action: ${actionInput.value}`;
+//         }
+//         submissionButton.disabled = false;
+//     }
+//     else {
+//         submissionText.innerHTML = "";
+//         submissionButton.disabled = true;
+//     }
+// }
+// Function to modify a command
+var modifyCommand = function (device, commands) {
+    toggleButton.click();
+    deviceTypeInput.value = device;
+    inputContainer.innerHTML = "\n    <label for=\"command0\" class=\"form-label\" style=\"margin-top: 10px;\">\n        <h5>\n            Commands:\n        </h5>\n    </label>\n    <input type=\"text\" id=\"command0\" name=\"command0\" class=\"form-control bg-dark text-light\" placeholder=\"For example: turn on\" required>";
+    inputCount = 1;
+    firstCommandInput = document.getElementById("command0");
+    commands.forEach(function (command) {
+        var input = document.getElementById("command" + (inputCount - 1));
+        input.value = command;
+        addInputField();
+    });
+    setSubmissionText();
 };
 // Function to delete a command
 var deleteCommand = function (commandKey) { return __awaiter(void 0, void 0, void 0, function () {
@@ -163,13 +185,19 @@ var deleteCommand = function (commandKey) { return __awaiter(void 0, void 0, voi
 }); };
 // Add command form submission
 commandForm.addEventListener("submit", function (event) { return __awaiter(void 0, void 0, void 0, function () {
-    var command, action, response, error_3;
+    var deviceType, commands, inputs, response, error_3;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
                 event.preventDefault();
-                command = commandInput.value;
-                action = actionInput.value;
+                deviceType = deviceTypeInput.value;
+                commands = [];
+                inputs = document.querySelectorAll("input");
+                inputs.forEach(function (input) {
+                    if (input.id === "deviceType" || input.value.trim() === "")
+                        return;
+                    commands.push(input.value.trim());
+                });
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 6, , 7]);
@@ -178,14 +206,13 @@ commandForm.addEventListener("submit", function (event) { return __awaiter(void 
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify({ command: command, action: action })
+                        body: JSON.stringify({ deviceType: deviceType, commands: commands })
                     })];
             case 2:
                 response = _a.sent();
                 if (!response.ok) return [3 /*break*/, 4];
                 message.innerText = "Command added successfully!";
-                commandInput.value = "";
-                actionInput.value = "";
+                inputCount = 0;
                 return [4 /*yield*/, loadCommands()];
             case 3:
                 _a.sent();
@@ -202,16 +229,57 @@ commandForm.addEventListener("submit", function (event) { return __awaiter(void 
         }
     });
 }); });
-commandInput.addEventListener("input", setSubmissionText);
-actionInput.addEventListener("input", setSubmissionText);
-commandInput.addEventListener("input", function () {
-    if (commandInput.value.includes("that")) {
-        thatKeyword.style.color = "lightgreen";
-    }
-    else {
-        thatKeyword.style.color = "white";
-    }
-});
+// Set the submission text
+var setSubmissionText = function () {
+    var inputs = document.querySelectorAll("input");
+    if (deviceTypeInput.value.trim() === "" || firstCommandInput.value.trim() === "")
+        return;
+    submissionText.innerHTML = "<h3>Individual commands:</h3>";
+    submissionText.innerHTML += "<h6>The keyword <i>that</i> indicates a gesture is expected</h6>";
+    var count = 1;
+    inputs.forEach(function (input) {
+        if (input.id === "deviceType")
+            return;
+        if (input.value.trim() !== "") {
+            submissionText.innerHTML += "<p><strong>Command " + count + ":</strong> " + input.value + " that " + deviceTypeInput.value + "</p>";
+        }
+        count++;
+    });
+    submissionText.innerHTML += "<h3>Commands for all " + deviceTypeInput.value + "s:</h3>";
+    count = 1;
+    inputs.forEach(function (input) {
+        if (input.id === "deviceType")
+            return;
+        if (input.value.trim() !== "") {
+            submissionText.innerHTML += "<p><strong>Command " + count + ":</strong> " + input.value + " all " + deviceTypeInput.value + "s</p>";
+        }
+        count++;
+    });
+};
+// Add a new input field
+var addInputField = function () {
+    var previousInput = document.getElementById("command" + (inputCount - 1));
+    if (previousInput.value.trim() === "")
+        return;
+    var newInput = document.createElement("input");
+    newInput.type = "text";
+    newInput.classList.add("form-control");
+    newInput.id = "command" + inputCount;
+    newInput.name = "command" + inputCount;
+    newInput.addEventListener("input", setSubmissionText);
+    newInput.classList.add("form-control", "bg-dark", "text-light");
+    if (inputCount === 1)
+        newInput.placeholder = "For example: turn off";
+    if (inputCount === 2)
+        newInput.placeholder = "For example: turn up";
+    if (inputCount === 3)
+        newInput.placeholder = "For example: turn down";
+    inputContainer.appendChild(newInput);
+    inputCount++;
+};
+firstCommandInput.addEventListener("input", setSubmissionText);
+deviceTypeInput.addEventListener("input", setSubmissionText);
+addButton.addEventListener("click", addInputField);
 // run these on load
 loadCommands();
 setSubmissionText();

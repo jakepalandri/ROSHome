@@ -12,3 +12,22 @@ button.btn-primary {
     margin-top: 10px;
     margin-bottom: 10px;
 }
+
+
+button.btn-secondary {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.modify-button {
+    margin-right: 5px;
+}
+
+.delete-button {
+    margin-left: 5px;
+}
+
+td {
+    vertical-align: middle;
+    width: 33%;
+}

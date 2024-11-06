@@ -14,37 +14,37 @@
             <h1 class="text-center">Smart Home Command Interface</h1>
         
             <!-- Toggle Button -->
-            <button id="toggleButton" class="btn btn-secondary mb-4">View Commands</button>
+            <button id="toggleButton" class="btn btn-secondary mb-4">View Device Commands</button>
         
             <!-- "Add Commands" Form -->
             <div id="addCommandsDiv" class="text-center" style="display:block">
-                <h2 class="mb-4">Add New Command</h2>
+                <h2 class="mb-4">Add New Device Type</h2>
                 <form id="commandForm">
                     <div class="form-group">
-                        <label for="command"><h5>Voice Command:</h5></label>
-                        <p id="thatKeyword">Using the keyword <i>that</i> will add a gesture to your command</p>
-                        <p>Voice commands do not require exact matches when spoken but will require these key words you set</p>
-                        <input type="text" id="command" name="command" class="form-control bg-dark text-light" placeholder="For example: turn on lights" required>
+                        <label for="deviceType"><h5>Device type:</h5></label>
+                        <input type="text" id="deviceType" name="deviceType" class="form-control bg-dark text-light" placeholder="For example: light" required>
                     </div>
-                    <div class="form-group">
-                        <label for="action" style="margin-top: 10px;"><h5>Action:</h5></label>
-                        <input type="text" id="action" name="action" class="form-control bg-dark text-light" placeholder="For example: lights_on" required>
+                    <div class="form-group" id="inputContainer">
+                        <label for="command0" class="form-label" style="margin-top: 10px;"><h5>Commands:</h5></label>
+                        <input type="text" id="command0" name="command0" class="form-control bg-dark text-light" placeholder="For example: turn on" required>
                     </div>
+                    <button type="button" id="addButton" class="btn btn-secondary">Add More Commands</button>
                     <p id="submission"></p>
-                    <button type="submit" class="btn btn-primary" id="submit">Add Command</button>
+                    <button type="submit" class="btn btn-primary" id="submit">Submit New Device Commands</button>
                 </form>
                 <p id="message" class="mt-3 text-light"></p>
             </div>
       
             <!-- "View/Remove Commands" Section -->
-            <div id="viewRemoveCommandsDiv" class="text-center" style="display: none;">
+            <!-- Have modify and delete button - modify just directs you to the previous page but prefills the info -->
+            <div id="viewCommandsDiv" class="text-center" style="display: none;">
                 <h2>Available Commands</h2>
                 <table id="commandTable" class="table table-dark">
                     <thead>
                       <tr>
-                        <th>Voice Command</th>
-                        <th>Action</th>
-                        <th>Delete</th>
+                        <th>Device</th>
+                        <th>Commands</th>
+                        <th>Modify</th>
                       </tr>
                     </thead>
                     <tbody id="commandList">
