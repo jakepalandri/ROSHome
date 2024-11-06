@@ -89,6 +89,8 @@ check canva or notes
 - Extension work
     - Implementing typeless voice commands with stored locations of devices
     - Implementing specific locations with vectors from gestures (not just walls)
+    - Have commands from MQTT automatically trigger a command on Home Assistant end
+        - Send command such as light.ceiling.turn_on
     - Pose Recognition for in the dark
 - What would you do differently?
 ## References
