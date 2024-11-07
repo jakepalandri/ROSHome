@@ -55,6 +55,8 @@ class ReadKinectPose(Node):
         self.tss = TimeSynchronizer([color_image, depth_image, camera_info], 10)
         self.tss.registerCallback(self.image_callback)
 
+        self.publisher = self.create_publisher(String, '/gesture_command', 10)
+
         self.client = MqttClient()
         self.frames_holding_gesture = 0
         self.last_gesture = ""
@@ -173,38 +175,38 @@ class ReadKinectPose(Node):
 
         return left_gesture, right_gesture, left_distance, right_distance
 
+    # def send_gesture(self, left_gesture, right_gesture):
+    #     if left_gesture == "none" and right_gesture == "none":
+    #         return
 
-    def send_gesture(self, left_gesture, right_gesture):
-        if left_gesture == "none" and right_gesture == "none":
-            return
+    #     # 8. Prepare gesture message
+    #     topic = "kinect_pose"
+    #     gesture = f"left_arm_{left_gesture}_right_arm_{right_gesture}"
+    #     if left_gesture == "none":
+    #         gesture = f"right_arm_{right_gesture}"
+    #     elif right_gesture == "none":
+    #         gesture = f"left_arm_{left_gesture}"
 
-        # 8. Prepare gesture message
-        topic = "kinect_pose"
-        gesture = f"left_arm_{left_gesture}_right_arm_{right_gesture}"
-        if left_gesture == "none":
-            gesture = f"right_arm_{right_gesture}"
-        elif right_gesture == "none":
-            gesture = f"left_arm_{left_gesture}"
+    #     payload = f'{{"gesture": "{gesture}"}}'
 
-        payload = f'{{"gesture": "{gesture}"}}'
+    #     # 9. Send gesture message
+    #     # 9a. If new gesture, reset timer, needs to be held for 2 frames
+    #     if self.last_gesture != gesture:
+    #         print(f"old gesture: {self.last_gesture} new gesture: {gesture}")
+    #         self.frames_holding_gesture = 1
+    #         self.last_gesture = gesture
+    #         return
 
-        # 9. Send gesture message
-        # 9a. If new gesture, reset timer, needs to be held for 2 frames
-        if self.last_gesture != gesture:
-            print(f"old gesture: {self.last_gesture} new gesture: {gesture}")
-            self.frames_holding_gesture = 1
-            self.last_gesture = gesture
-            return
+    #     # 9b. If gesture has been held for less than 2 frames, increment
+    #     if self.frames_holding_gesture < 2:
+    #         print(f"frames holding gesture: {str(self.frames_holding_gesture)}")
+    #         self.frames_holding_gesture += 1
+    #         return
 
-        # 9b. If gesture has been held for less than 2 frames, increment
-        if self.frames_holding_gesture < 2:
-            print(f"frames holding gesture: {str(self.frames_holding_gesture)}")
-            self.frames_holding_gesture += 1
-            return
-
-        # 9c. Otherwise, send the message
-        self.client.pub(topic, payload)
-        print(f"sending message: {payload}")
+    #     # 9c. Otherwise, send the message
+    #     self.client.pub(topic, payload)
+    #     self.publisher.publish(String(data=payload))
+    #     print(f"sending message: {payload}")
 
     def store_gesture(self, left_gesture, right_gesture, left_distance, right_distance, gesture_time):
         # only store the last 10 seconds of gestures
@@ -304,6 +306,7 @@ class ReadKinectPose(Node):
             return
         
         self.client.pub(topic, payload)
+        self.publisher.publish(String(data=payload))
         print(f"sending message: {payload}")
     
     def get_command(self, closest_match):
