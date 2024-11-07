@@ -92,6 +92,7 @@ check canva or notes
     - Have commands from MQTT automatically trigger a command on Home Assistant end
         - Send command such as light.ceiling.turn_on
     - Pose Recognition for in the dark
+    - More advanced commands to include variables such as a brightness level to set a light to
 - What would you do differently?
 ## References
 ## Appendix
