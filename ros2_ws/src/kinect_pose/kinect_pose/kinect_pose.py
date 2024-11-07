@@ -6,6 +6,7 @@ import math
 import numpy as np
 import rclpy
 import json
+import re
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 from playsound import playsound
@@ -251,42 +252,67 @@ class ReadKinectPose(Node):
         send_command = False
         starts_with_home = False
 
-        for option in speech_json["alternatives"]:
-            text = option["text"]
+        for sentence in speech_json["alternatives"]:
+            text = sentence["text"]
             if text.startswith("home"):
                 starts_with_home = True
                 text = text[5:]
-            # we could use a regex to match the text
-            # we could also match partial sentences with commands
-            # for now only going to match exact commands
-            if text in self.commands.keys():
-                send_command = True
-                payload = f'{{"command": "{self.commands[text]}"}}'
-                if "that" in text:
-                    payload = f'{{"command": "{self.get_command(option, start_time)}"}}'
-                break
+            else:
+                continue
+
+            possible_matches = []
+
+            for device in self.commands.keys():
+                for command in self.commands[device]:
+                    regex = f".*\b{command}\b.*\bthat\b.*\b{device}\b.*"
+                    regex_all = f".*\b{command}\b.*\b(all|every)\b.*{device}s?\b.*"
+
+                    if re.match(regex_all, text):
+                        send_command = True
+                        possible_matches.append({
+                            "command": command,
+                            "device": device,
+                            "all": False,
+                            "time": self.word_time(device, sentence),
+                            "sentence": sentence
+                        })
+                    elif re.match(regex, text):
+                        send_command = True
+                        possible_matches.append({
+                            "command": command,
+                            "device": device,
+                            "all": True,
+                            "time": self.word_time(device, sentence),
+                            "sentence": sentence
+                        })
+            
+            if len(possible_matches) == 0:
+                continue
+
+            possible_matches.sort(key=lambda x: x["time"], reverse=True)
+
+            closest_match = possible_matches[0]
+
+            send_command = True
+            payload = self.get_command(closest_match)
+            break
 
         # 10. Send command message
-        if not send_command or payload == '{"command": "unknown_command"}':
+        if not send_command:
             if starts_with_home:
                 self.respond()
             return
         
         self.client.pub(topic, payload)
         print(f"sending message: {payload}")
-
-    def get_command(self, option, start_time):
-        that_relative_time = 0
-        for word in option["result"]:
-            if word["word"] == "that":
-                # add half a second to account for processing delay
-                # 0.5s chosen based on preliminary testing
-                that_relative_time = (word["start"] + 0.5) * 10 ** 9
-        that_time = start_time + that_relative_time
-
-        print(f"that time: {that_time // 10 ** 7 / 100}")
-        for gesture_time in self.gesture_history:
-            print(f"{{    time: {gesture_time['time'] // 10 ** 7 / 100}, gesture: {gesture_time['gesture']}}}")
+    
+    def get_command(self, closest_match):
+        closest_match["command"] = closest_match["command"].replace(" ", "_")
+        closest_match["device"] = closest_match["device"].replace(" ", "_")
+        if (closest_match["all"]):
+            return f'{{"command": "all_{closest_match["device"]}.{closest_match["command"]}"}}'
+        
+        that_time = self.word_time("that", closest_match["sentence"], start_time)
 
         closest_gesture = ""
         max_diff = math.inf
@@ -296,16 +322,18 @@ class ReadKinectPose(Node):
                 max_diff = diff
                 closest_gesture = gesture_time["gesture"]
 
-        if "light" in option["text"]:
-            return f"{closest_gesture}_{self.commands[option['text']]}"
+        return f'{{"command": "{closest_gesture}_{closest_match["device"]}.{closest_match["command"]}"}}'
 
-        if closest_gesture in ["right", "ceiling", "left"]:
-            return f"{closest_gesture}_light_{self.commands[option['text']]}"
 
-        if closest_gesture == "front":
-            return f"tv_{self.commands[option['text']]}"
+    def word_time(self, word, sentence, start_time = 0):
+        word_relative_time = 0
+        for word in sentence["result"]:
+            if word["word"] == word:
+                # add half a second to account for processing delay
+                # 0.5s chosen based on preliminary testing
+                word_relative_time = (word["start"] + 0.5) * 10 ** 9
 
-        return "unknown_command"
+        return start_time + word_relative_time
 
     def respond(self):
         playsound("assets/audio/response.mp3")
