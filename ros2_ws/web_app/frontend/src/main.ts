@@ -23,6 +23,7 @@ toggleButton.addEventListener("click", async () => {
 
     // Update button text
     toggleButton.textContent = addCommandsVisible ? "Add Commands": "View Commands";
+    message.innerText = "";
     await loadCommands();
 });
 
@@ -75,28 +76,9 @@ const loadCommands = async () => {
     }
 }
 
-// // Set submission text and enable/disable submission button to confirm values to the user
-// const setSubmissionText = () => {
-//     if (commandInput.value !== "" && actionInput.value !== "") {
-//         submissionText.innerHTML = `Command: ${commandInput.value} <br>`;
-//         if (commandInput.value.includes("that")) {
-//             submissionText.innerHTML += `Action: [gesture]_${actionInput.value}`;
-//         }
-//         else {
-//             submissionText.innerHTML += `Action: ${actionInput.value}`;
-//         }
-//         submissionButton.disabled = false;
-//     }
-//     else {
-//         submissionText.innerHTML = "";
-//         submissionButton.disabled = true;
-//     }
-// }
-
-// Function to modify a command
-const modifyCommand = (device: string, commands: string[]) => {
-    toggleButton.click();
-    deviceTypeInput.value = device;
+// Reset input fields
+const resetInputs = () => {
+    deviceTypeInput.value = "";
     inputContainer.innerHTML = `
     <label for="command0" class="form-label" style="margin-top: 10px;">
         <h5>
@@ -106,6 +88,16 @@ const modifyCommand = (device: string, commands: string[]) => {
     <input type="text" id="command0" name="command0" class="form-control bg-dark text-light" placeholder="For example: turn on" required>`;
     inputCount = 1;
     firstCommandInput = document.getElementById("command0") as HTMLInputElement;
+    submissionText.innerHTML = "";
+    inputContainer.appendChild(firstCommandInput);
+}
+
+// Function to modify a command
+const modifyCommand = (device: string, commands: string[]) => {
+    toggleButton.click();
+    resetInputs();
+    deviceTypeInput.value = device;
+    
     commands.forEach(command => {
         const input = document.getElementById(`command${inputCount - 1}`) as HTMLInputElement;
         input.value = command;
@@ -153,8 +145,8 @@ commandForm.addEventListener("submit", async (event) => {
         });
 
         if (response.ok) {
-            message.innerText = "Command added successfully!";
-            inputCount = 0;
+            message.innerText = "Commands set successfully!";
+            resetInputs();
             await loadCommands();
         } else {
             message.innerText = "Failed to add command.";

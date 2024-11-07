@@ -98,7 +98,6 @@ var loadCommands = function () { return __awaiter(void 0, void 0, void 0, functi
                     row.appendChild(valuesCell);
                     // Create actions cell with delete button
                     var actionsCell = document.createElement("td");
-                    actionsCell.style.alignItems = "center";
                     var modifyButton = document.createElement("button");
                     modifyButton.className = "btn btn-primary btn-sm modify-button";
                     modifyButton.textContent = "Modify";
@@ -140,13 +139,20 @@ var loadCommands = function () { return __awaiter(void 0, void 0, void 0, functi
 //         submissionButton.disabled = true;
 //     }
 // }
-// Function to modify a command
-var modifyCommand = function (device, commands) {
-    toggleButton.click();
-    deviceTypeInput.value = device;
+// Reset input fields
+var resetInputs = function () {
+    deviceTypeInput.value = "";
     inputContainer.innerHTML = "\n    <label for=\"command0\" class=\"form-label\" style=\"margin-top: 10px;\">\n        <h5>\n            Commands:\n        </h5>\n    </label>\n    <input type=\"text\" id=\"command0\" name=\"command0\" class=\"form-control bg-dark text-light\" placeholder=\"For example: turn on\" required>";
     inputCount = 1;
     firstCommandInput = document.getElementById("command0");
+    submissionText.innerHTML = "";
+    inputContainer.appendChild(firstCommandInput);
+};
+// Function to modify a command
+var modifyCommand = function (device, commands) {
+    toggleButton.click();
+    resetInputs();
+    deviceTypeInput.value = device;
     commands.forEach(function (command) {
         var input = document.getElementById("command" + (inputCount - 1));
         input.value = command;
@@ -212,7 +218,7 @@ commandForm.addEventListener("submit", function (event) { return __awaiter(void 
                 response = _a.sent();
                 if (!response.ok) return [3 /*break*/, 4];
                 message.innerText = "Command added successfully!";
-                inputCount = 0;
+                resetInputs();
                 return [4 /*yield*/, loadCommands()];
             case 3:
                 _a.sent();

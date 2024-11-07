@@ -3,12 +3,15 @@
         "turn on",
         "turn off",
         "turn up",
-        "turn down"
+        "turn down",
+        "toggle"
     ],
     "tv": [
         "turn on",
         "turn off",
         "turn up",
-        "turn down"
+        "turn down",
+        "fast forward",
+        "rewind"
     ]
 }
