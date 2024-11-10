@@ -15,7 +15,7 @@ export ROS_MASTER_URI=http://localhost:11311
 rosparam load ~/ROSHome/bridge.yaml
 ros2 run ros1_bridge parameter_bridge
 
-# TERMINAL 4 (Kinect):
+# TERMINAL 4 (Example View Kinect):
 srk
 # Kinect Viewer
 rosrun kinect2_viewer kinect2_viewer sd cloud # requires kinect2_bridge to be running
