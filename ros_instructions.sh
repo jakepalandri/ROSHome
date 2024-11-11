@@ -15,23 +15,7 @@ export ROS_MASTER_URI=http://localhost:11311
 rosparam load ~/ROSHome/bridge.yaml
 ros2 run ros1_bridge parameter_bridge
 
-# TERMINAL 4 (Example View Kinect):
-srk
-# Kinect Viewer
-rosrun kinect2_viewer kinect2_viewer sd cloud # requires kinect2_bridge to be running
-
-# TERMINAL 4 (Example ROS 1 Program):
-sr1
-# ROS1 PROGRAMS
-rviz # Open the kinect.rviz config file
-
 # TERMINAL 4 (Kinect Gesture and Voice Command Recognition):
-# sr2
-# ROS2 PROGRAMS
-# rviz2 # Open the kinect2.rviz config file
-# srws
-# colcon build the package first, ensuring in correct directory
-# ros2 run package executable_name
 sr2
 srws
 cd ~/ROSHome/ros2_ws
