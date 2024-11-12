@@ -40,8 +40,8 @@ class Point(IntEnum):
 class ReadKinectPose(Node):
     def __init__(self):
         super().__init__('read_kinect_pose')
-        self.min = [-2500, -1000, 0000]
-        self.max = [ 2500,  3000, 5000]
+        self.min = [-2000, -1000, 0000]
+        self.max = [ 2000,  2000, 5000]
 
         self.model = YOLO("assets/models/yolov8m-pose.pt")
         self.model = self.model.to("cuda" if torch.cuda.is_available() else "cpu")
@@ -206,7 +206,7 @@ class ReadKinectPose(Node):
     #     # 9c. Otherwise, send the message
     #     self.client.pub(topic, payload)
     #     self.publisher.publish(String(data=payload))
-    #     print(f"sending message: {payload}")
+    #     print(f"Sending message: {payload}")
 
     def store_gesture(self, left_gesture, right_gesture, left_distance, right_distance, gesture_time):
         # only store the last 10 seconds of gestures
@@ -246,7 +246,7 @@ class ReadKinectPose(Node):
     def process_speech(self, speech_info):
         # 9. Process speech and get command
         speech_json = json.loads(speech_info.data)
-        print(speech_json)
+        print(json.dumps(speech_json, indent=2))
 
         topic = "kinect_pose"
         start_time = speech_json["start_time_ns"]
@@ -258,32 +258,27 @@ class ReadKinectPose(Node):
             text = sentence["text"]
             if text.startswith("home"):
                 starts_with_home = True
-                text = text[5:]
-            else:
-                continue
 
+        for sentence in speech_json["alternatives"]:
             possible_matches = []
 
             for device in self.commands.keys():
                 for command in self.commands[device]:
-                    regex = f".*\b{command}\b.*\bthat\b.*\b{device}\b.*"
-                    regex_all = f".*\b{command}\b.*\b(all|every)\b.*{device}s?\b.*"
-
+                    regex = rf".*\b{command}\b.*\bthat\b.*\b{device}\b.*"
+                    regex_all = rf".*\b{command}\b.*\b(all|every)\b.*{device}s?\b.*"
                     if re.match(regex_all, text):
-                        send_command = True
-                        possible_matches.append({
-                            "command": command,
-                            "device": device,
-                            "all": False,
-                            "time": self.word_time(device, sentence),
-                            "sentence": sentence
-                        })
-                    elif re.match(regex, text):
-                        send_command = True
                         possible_matches.append({
                             "command": command,
                             "device": device,
                             "all": True,
+                            "time": self.word_time(device, sentence),
+                            "sentence": sentence
+                        })
+                    elif re.match(regex, text):
+                        possible_matches.append({
+                            "command": command,
+                            "device": device,
+                            "all": False,
                             "time": self.word_time(device, sentence),
                             "sentence": sentence
                         })
@@ -292,24 +287,22 @@ class ReadKinectPose(Node):
                 continue
 
             possible_matches.sort(key=lambda x: x["time"], reverse=True)
-
             closest_match = possible_matches[0]
-
             send_command = True
-            payload = self.get_command(closest_match)
+            payload = self.get_command(closest_match, start_time)
             break
 
         # 10. Send command message
         if not send_command:
             if starts_with_home:
-                self.respond()
+                self.respond("no_command")
             return
         
         self.client.pub(topic, payload)
         self.publisher.publish(String(data=payload))
-        print(f"sending message: {payload}")
+        self.get_logger().info(f"Sending message: {payload}")
     
-    def get_command(self, closest_match):
+    def get_command(self, closest_match, start_time = 0):
         closest_match["command"] = closest_match["command"].replace(" ", "_")
         closest_match["device"] = closest_match["device"].replace(" ", "_")
         if (closest_match["all"]):
@@ -325,26 +318,32 @@ class ReadKinectPose(Node):
                 max_diff = diff
                 closest_gesture = gesture_time["gesture"]
 
+        if (closest_gesture == ""):
+            self.respond("no_gesture")
+
         return f'{{"command": "{closest_gesture}_{closest_match["device"]}.{closest_match["command"]}"}}'
 
 
-    def word_time(self, word, sentence, start_time = 0):
+    def word_time(self, match_word, sentence, start_time = 0):
         word_relative_time = 0
         for word in sentence["result"]:
-            if word["word"] == word:
+            if word["word"] == match_word:
                 # add half a second to account for processing delay
                 # 0.5s chosen based on preliminary testing
                 word_relative_time = (word["start"] + 0.5) * 10 ** 9
 
         return start_time + word_relative_time
 
-    def respond(self):
-        playsound("assets/audio/response.mp3")
+    def respond(self, reason):
+        try:
+            playsound(f"assets/audio/{reason}.mp3")
+        except Exception as e:
+            self.get_logger().warning(f"Error playing audio: {e}")
 
     def load_commands(self):
         with open("assets/json/commands.json", "r") as f:
             self.commands = json.load(f)
-        print("Commands reloaded:", self.commands)
+        self.get_logger().info(f"Commands reloaded:{json.dumps(self.commands, indent=2)}")
 
     def min_depth(self, depth, keypoint):
         diameter = 10
@@ -384,7 +383,7 @@ class ReadKinectPose(Node):
         try:
             t_min = min(t_values)
         except Exception as e:
-            print(f"DEBUG:\n  Point : {np.array2string(point)}\n  Vector: {np.array2string(vector)}")
+            self.get_logger().debug(f"DEBUG:\n  Point : {np.array2string(point)}\n  Vector: {np.array2string(vector)}")
             raise e
 
         # Find the smallest positive t-value
