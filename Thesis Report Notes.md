@@ -93,6 +93,8 @@ check canva or notes
         - Send command such as light.ceiling.turn_on
     - Pose Recognition for in the dark
     - More advanced commands to include variables such as a brightness level to set a light to
+    - More advanced Speech To Text engine from OpenAI that supports streaming
+        - This is the biggest hinderance
 - What would you do differently?
 ## References
 ## Appendix

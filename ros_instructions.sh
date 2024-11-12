@@ -22,15 +22,15 @@ cd ~/ROSHome/ros2_ws
 colcon build --packages-select kinect_pose
 ros2 run kinect_pose listener
 
-# TERMINAL 5 (Mosquitto Broker): 
-mosquitto_sub -v -h localhost -p 1883 -t '#'
-
-# TERMINAL 6 (Speech to Text):
+# TERMINAL 5 (Speech to Text):
 sr2
 srws
 cd ~/ROSHome/ros2_ws
 colcon build --packages-select speech_to_text
 ros2 run speech_to_text listener
+
+# TERMINAL 6 (Mosquitto Broker): 
+mosquitto_sub -v -h localhost -p 1883 -t '#'
 
 # TERMINAL 7 (Voice Command Web Server):
 cd ~/ROSHome/ros2_ws/web_app/backend
