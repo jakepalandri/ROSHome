@@ -306,7 +306,7 @@ class ReadKinectPose(Node):
         closest_match["command"] = closest_match["command"].replace(" ", "_")
         closest_match["device"] = closest_match["device"].replace(" ", "_")
         if (closest_match["all"]):
-            return f'{{"command": "all_{closest_match["device"]}.{closest_match["command"]}"}}'
+            return f'{{"command": "all_{closest_match["device"]}s.{closest_match["command"]}"}}'
         
         that_time = self.word_time("that", closest_match["sentence"], start_time)
 
