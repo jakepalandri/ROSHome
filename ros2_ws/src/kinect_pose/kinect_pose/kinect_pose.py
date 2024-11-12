@@ -3,6 +3,7 @@ from ultralytics import YOLO
 from .MqttClient import MqttClient
 import torch
 import math
+import string
 import numpy as np
 import rclpy
 import json
@@ -40,8 +41,8 @@ class Point(IntEnum):
 class ReadKinectPose(Node):
     def __init__(self):
         super().__init__('read_kinect_pose')
-        self.min = [-2500, -1000, 0000]
-        self.max = [ 2500,  3000, 5000]
+        self.min = [-2000, -1000, 0000]
+        self.max = [ 2000,  2000, 5000]
 
         self.model = YOLO("assets/models/yolov8m-pose.pt")
         self.model = self.model.to("cuda" if torch.cuda.is_available() else "cpu")
@@ -60,6 +61,9 @@ class ReadKinectPose(Node):
         self.client = MqttClient()
         self.frames_holding_gesture = 0
         self.last_gesture = ""
+        self.last_command_command = ""
+        self.last_command_device  = ""
+        self.last_command_span = 0
 
         self.gesture_history = []
         self.load_commands()
@@ -246,74 +250,83 @@ class ReadKinectPose(Node):
     def process_speech(self, speech_info):
         # 9. Process speech and get command
         speech_json = json.loads(speech_info.data)
-        print(speech_json)
+        # print(json.dumps(speech_json, indent=2))
+        start_time = speech_json["start_time_ns"]
+        that_time = self.word_time("that", speech_json, start_time)
+        print(speech_json["text"])
+        print(that_time // 10 ** 7 / 100)
+        for gesture_time in self.gesture_history:
+            if gesture_time["gesture"] == "ceiling":
+                print("ceiling:" + str(gesture_time["time"] // 10 ** 7 / 100))
+                break
 
         topic = "kinect_pose"
         start_time = speech_json["start_time_ns"]
+        time_span = speech_json["time_span"]
         payload = ""
-        send_command = False
-        starts_with_home = False
 
-        for sentence in speech_json["alternatives"]:
-            text = sentence["text"]
-            if text.startswith("home"):
-                starts_with_home = True
-                text = text[5:]
-            else:
-                continue
+        text = speech_json["text"].translate(str.maketrans('', '', string.punctuation)).lower().strip()
+        possible_matches = []
 
-            possible_matches = []
+        for device in self.commands.keys():
+            for command in self.commands[device]:
+                regex = rf".*\b{command}\b.*\bthat\b.*\b{device}\b.*"
+                regex_all = rf".*\b{command}\b.*\b(all|every)\b.*{device}s?\b.*"
 
-            for device in self.commands.keys():
-                for command in self.commands[device]:
-                    regex = f".*\b{command}\b.*\bthat\b.*\b{device}\b.*"
-                    regex_all = f".*\b{command}\b.*\b(all|every)\b.*{device}s?\b.*"
+                if re.match(regex_all, text):
+                    print(text)
+                    print(f"{command} (all|every) {device}s")
+                    possible_matches.append({
+                        "command": command,
+                        "device": device,
+                        "all": True,
+                        "time": self.word_time(device, speech_json),
+                        "sentence": speech_json
+                    })
+                elif re.match(regex, text):
+                    print(text)
+                    print(f"{command} that {device}")
+                    possible_matches.append({
+                        "command": command,
+                        "device": device,
+                        "all": False,
+                        "time": self.word_time(device, speech_json),
+                        "sentence": speech_json
+                    })
 
-                    if re.match(regex_all, text):
-                        send_command = True
-                        possible_matches.append({
-                            "command": command,
-                            "device": device,
-                            "all": False,
-                            "time": self.word_time(device, sentence),
-                            "sentence": sentence
-                        })
-                    elif re.match(regex, text):
-                        send_command = True
-                        possible_matches.append({
-                            "command": command,
-                            "device": device,
-                            "all": True,
-                            "time": self.word_time(device, sentence),
-                            "sentence": sentence
-                        })
-            
-            if len(possible_matches) == 0:
-                continue
-
-            possible_matches.sort(key=lambda x: x["time"], reverse=True)
-
-            closest_match = possible_matches[0]
-
-            send_command = True
-            payload = self.get_command(closest_match)
-            break
-
-        # 10. Send command message
-        if not send_command:
-            if starts_with_home:
-                self.respond()
+        if len(possible_matches) == 0:
             return
-        
+
+        possible_matches.sort(key=lambda x: x["time"], reverse=True)
+        closest_match = possible_matches[0]
+
+        # if the same command is sent twice in a row within 5 seconds (due to two 5 second clips being added together), ignore the second command
+        if (closest_match["device"]  == self.last_command_device  and
+            closest_match["command"] == self.last_command_command and
+            self.last_command_span == 5 and
+            time_span == 10):
+            self.last_command_span = 0
+            print(closest_match["command"])
+            self.last_command_command = closest_match["command"]
+            print(self.last_command_command)
+            self.last_command_device  = closest_match["device" ] 
+            print("IGNORING COMMAND")
+            return
+
+        payload = self.get_command(closest_match, start_time)
+        self.last_command_command = closest_match["command"]
+        self.last_command_device  = closest_match["device" ]
+        self.last_command_span = time_span
         self.client.pub(topic, payload)
         self.publisher.publish(String(data=payload))
-        print(f"sending message: {payload}")
+        self.get_logger().info(f"Sending message: {payload}")
     
-    def get_command(self, closest_match):
-        closest_match["command"] = closest_match["command"].replace(" ", "_")
-        closest_match["device"] = closest_match["device"].replace(" ", "_")
-        if (closest_match["all"]):
-            return f'{{"command": "all_{closest_match["device"]}.{closest_match["command"]}"}}'
+    def get_command(self, closest_match, start_time):
+        # print(json.dumps(closest_match, indent=2))
+        command = closest_match["command"].replace(" ", "_")
+        device = closest_match["device"].replace(" ", "_")
+        if closest_match["all"]:
+            return f'{{"command": "all_{device}s.{command}"}}'
         
         that_time = self.word_time("that", closest_match["sentence"], start_time)
 
@@ -324,22 +337,42 @@ class ReadKinectPose(Node):
             if diff < max_diff:
                 max_diff = diff
                 closest_gesture = gesture_time["gesture"]
+        
+        payload = f'{{"command": "{closest_gesture}_{device}.{command}"}}'
 
-        return f'{{"command": "{closest_gesture}_{closest_match["device"]}.{closest_match["command"]}"}}'
+        # time_span = closest_match["sentence"]["time_span"]
+        # # if the same command is sent twice in a row within 5 seconds (due to two 5 second clips being added together), and a gesture is missing, do not announce
+        # if (payload == self.last_command and
+        #     self.last_command_span == 5 and
+        #     time_span == 10):
+        #     print("IGNORING COMMAND")
+        #     return payload
+
+        if closest_gesture == "":
+            self.respond("no_gesture")
+
+        return payload
 
 
     def word_time(self, word, sentence, start_time = 0):
         word_relative_time = 0
-        for word in sentence["result"]:
-            if word["word"] == word:
+        for sentence_word in sentence["segments"][0]["words"]:
+            bare_word = sentence_word["word"].translate(str.maketrans('', '', string.punctuation)).lower().strip()
+            if bare_word == word:
                 # add half a second to account for processing delay
-                # 0.5s chosen based on preliminary testing
-                word_relative_time = (word["start"] + 0.5) * 10 ** 9
+                # 3s chosen based on preliminary testing
+                word_relative_time = (sentence_word["start"] - 3) * 10 ** 9
+        
+        if word_relative_time == 0:
+            return math.inf
 
         return start_time + word_relative_time
 
-    def respond(self):
-        playsound("assets/audio/response.mp3")
+    def respond(self, reason):
+        try:
+            playsound(f"assets/audio/{reason}.mp3")
+        except Exception as e:
+            print(e)
 
     def load_commands(self):
         with open("assets/json/commands.json", "r") as f:
