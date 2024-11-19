@@ -270,7 +270,7 @@ https://reolink.com/blog/smart-home-frequent-issues/#4-automation-and-routine-fa
 - [x] Wake word
 - [x] User can upload their own commands
 - [x] More detail in frontend
-- [ ] Pattern matching for commands
+- [x] Pattern matching for commands
     - Plan for this:
     - User enters a device type
     - User enters a list of possible voice commands
