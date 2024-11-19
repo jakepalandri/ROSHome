@@ -81,6 +81,8 @@ check canva or notes
     - Voice commands, etc.
 ## Methodology
 - Talk about ROS and how devices interface, speech tools, models etc.
+- Tech Stack
+- Physical Setup Diagram
 ## Evaluation
 - Incl. photos
 - What worked and what didn't?
