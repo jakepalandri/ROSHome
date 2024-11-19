@@ -260,6 +260,7 @@ class ReadKinectPose(Node):
                 starts_with_home = True
 
         for sentence in speech_json["alternatives"]:
+            text = sentence["text"]
             possible_matches = []
 
             for device in self.commands.keys():
@@ -384,7 +385,6 @@ class ReadKinectPose(Node):
             t_min = min(t_values)
         except Exception as e:
             self.get_logger().debug(f"DEBUG:\n  Point : {np.array2string(point)}\n  Vector: {np.array2string(vector)}")
-            raise e
 
         # Find the smallest positive t-value
 
