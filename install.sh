@@ -1,3 +1,7 @@
+# Install git and download this repository to your machine
+sudo apt install git
+git clone git@github.com:jakepalandri/ROSHome.git
+
 # ROS 1 INSTALLATION
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
 
