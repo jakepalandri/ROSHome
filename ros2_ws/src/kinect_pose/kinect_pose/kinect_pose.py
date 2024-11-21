@@ -210,7 +210,7 @@ class ReadKinectPose(Node):
     #     # 9c. Otherwise, send the message
     #     self.client.pub(topic, payload)
     #     self.publisher.publish(String(data=payload))
-    #     print(f"sending message: {payload}")
+    #     print(f"Sending message: {payload}")
 
     def store_gesture(self, left_gesture, right_gesture, left_distance, right_distance, gesture_time):
         # only store the last 10 seconds of gestures
@@ -250,51 +250,58 @@ class ReadKinectPose(Node):
     def process_speech(self, speech_info):
         # 9. Process speech and get command
         speech_json = json.loads(speech_info.data)
-        # print(json.dumps(speech_json, indent=2))
-        start_time = speech_json["start_time_ns"]
-        that_time = self.word_time("that", speech_json, start_time)
-        print(speech_json["text"])
-        print(that_time // 10 ** 7 / 100)
-        for gesture_time in self.gesture_history:
-            if gesture_time["gesture"] == "ceiling":
-                print("ceiling:" + str(gesture_time["time"] // 10 ** 7 / 100))
-                break
+        print(json.dumps(speech_json, indent=2))
 
         topic = "kinect_pose"
         start_time = speech_json["start_time_ns"]
         time_span = speech_json["time_span"]
         payload = ""
+        send_command = False
+        starts_with_home = False
 
-        text = speech_json["text"].translate(str.maketrans('', '', string.punctuation)).lower().strip()
-        possible_matches = []
+        for sentence in speech_json["alternatives"]:
+            text = sentence["text"]
+            if text.startswith("home"):
+                starts_with_home = True
 
-        for device in self.commands.keys():
-            for command in self.commands[device]:
-                regex = rf".*\b{command}\b.*\bthat\b.*\b{device}\b.*"
-                regex_all = rf".*\b{command}\b.*\b(all|every)\b.*{device}s?\b.*"
+        for sentence in speech_json["alternatives"]:
+            text = sentence["text"]
+            possible_matches = []
 
-                if re.match(regex_all, text):
-                    print(text)
-                    print(f"{command} (all|every) {device}s")
-                    possible_matches.append({
-                        "command": command,
-                        "device": device,
-                        "all": True,
-                        "time": self.word_time(device, speech_json),
-                        "sentence": speech_json
-                    })
-                elif re.match(regex, text):
-                    print(text)
-                    print(f"{command} that {device}")
-                    possible_matches.append({
-                        "command": command,
-                        "device": device,
-                        "all": False,
-                        "time": self.word_time(device, speech_json),
-                        "sentence": speech_json
-                    })
+            for device in self.commands.keys():
+                for command in self.commands[device]:
+                    regex = rf".*\b{command}\b.*\bthat\b.*\b{device}\b.*"
+                    regex_all = rf".*\b{command}\b.*\b(all|every)\b.*{device}s?\b.*"
+                    if re.match(regex_all, text):
+                        possible_matches.append({
+                            "command": command,
+                            "device": device,
+                            "all": True,
+                            "time": self.word_time(device, sentence),
+                            "sentence": sentence
+                        })
+                    elif re.match(regex, text):
+                        possible_matches.append({
+                            "command": command,
+                            "device": device,
+                            "all": False,
+                            "time": self.word_time(device, sentence),
+                            "sentence": sentence
+                        })
+            
+            if len(possible_matches) == 0:
+                continue
 
-        if len(possible_matches) == 0:
+            possible_matches.sort(key=lambda x: x["time"], reverse=True)
+            closest_match = possible_matches[0]
+            send_command = True
+            payload = self.get_command(closest_match, start_time)
+            break
+
+        # 10. Send command message
+        if not send_command:
+            if starts_with_home:
+                self.respond("no_command")
             return
 
         possible_matches.sort(key=lambda x: x["time"], reverse=True)
@@ -321,12 +328,11 @@ class ReadKinectPose(Node):
         self.publisher.publish(String(data=payload))
         self.get_logger().info(f"Sending message: {payload}")
     
-    def get_command(self, closest_match, start_time):
-        # print(json.dumps(closest_match, indent=2))
-        command = closest_match["command"].replace(" ", "_")
-        device = closest_match["device"].replace(" ", "_")
-        if closest_match["all"]:
-            return f'{{"command": "all_{device}s.{command}"}}'
+    def get_command(self, closest_match, start_time = 0):
+        closest_match["command"] = closest_match["command"].replace(" ", "_")
+        closest_match["device"] = closest_match["device"].replace(" ", "_")
+        if (closest_match["all"]):
+            return f'{{"command": "all_{closest_match["device"]}s.{closest_match["command"]}"}}'
         
         that_time = self.word_time("that", closest_match["sentence"], start_time)
 
@@ -351,14 +357,16 @@ class ReadKinectPose(Node):
         if closest_gesture == "":
             self.respond("no_gesture")
 
-        return payload
+        if (closest_gesture == ""):
+            self.respond("no_gesture")
+
+        return f'{{"command": "{closest_gesture}_{closest_match["device"]}.{closest_match["command"]}"}}'
 
 
-    def word_time(self, word, sentence, start_time = 0):
+    def word_time(self, match_word, sentence, start_time = 0):
         word_relative_time = 0
-        for sentence_word in sentence["segments"][0]["words"]:
-            bare_word = sentence_word["word"].translate(str.maketrans('', '', string.punctuation)).lower().strip()
-            if bare_word == word:
+        for word in sentence["result"]:
+            if word["word"] == match_word:
                 # add half a second to account for processing delay
                 # 3s chosen based on preliminary testing
                 word_relative_time = (sentence_word["start"] - 3) * 10 ** 9
@@ -372,12 +380,12 @@ class ReadKinectPose(Node):
         try:
             playsound(f"assets/audio/{reason}.mp3")
         except Exception as e:
-            print(e)
+            self.get_logger().warning(f"Error playing audio: {e}")
 
     def load_commands(self):
         with open("assets/json/commands.json", "r") as f:
             self.commands = json.load(f)
-        print("Commands reloaded:", self.commands)
+        self.get_logger().info(f"Commands reloaded:{json.dumps(self.commands, indent=2)}")
 
     def min_depth(self, depth, keypoint):
         diameter = 10
@@ -417,8 +425,7 @@ class ReadKinectPose(Node):
         try:
             t_min = min(t_values)
         except Exception as e:
-            print(f"DEBUG:\n  Point : {np.array2string(point)}\n  Vector: {np.array2string(vector)}")
-            raise e
+            self.get_logger().debug(f"DEBUG:\n  Point : {np.array2string(point)}\n  Vector: {np.array2string(vector)}")
 
         # Find the smallest positive t-value
 
