@@ -1,5 +1,5 @@
 # Install git and download this repository to your machine
-sudo apt install git
+sudo apt -y install git
 git clone git@github.com:jakepalandri/ROSHome.git
 
 # ROS 1 INSTALLATION
