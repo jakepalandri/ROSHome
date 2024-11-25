@@ -3,7 +3,6 @@ from ultralytics import YOLO
 from .MqttClient import MqttClient
 import torch
 import math
-import string
 import numpy as np
 import rclpy
 import json
@@ -61,9 +60,6 @@ class ReadKinectPose(Node):
         self.client = MqttClient()
         self.frames_holding_gesture = 0
         self.last_gesture = ""
-        self.last_command_command = ""
-        self.last_command_device  = ""
-        self.last_command_span = 0
 
         self.gesture_history = []
         self.load_commands()
@@ -254,7 +250,6 @@ class ReadKinectPose(Node):
 
         topic = "kinect_pose"
         start_time = speech_json["start_time_ns"]
-        time_span = speech_json["time_span"]
         payload = ""
         send_command = False
         starts_with_home = False
@@ -303,27 +298,7 @@ class ReadKinectPose(Node):
             if starts_with_home:
                 self.respond("no_command")
             return
-
-        possible_matches.sort(key=lambda x: x["time"], reverse=True)
-        closest_match = possible_matches[0]
-
-        # if the same command is sent twice in a row within 5 seconds (due to two 5 second clips being added together), ignore the second command
-        if (closest_match["device"]  == self.last_command_device  and
-            closest_match["command"] == self.last_command_command and
-            self.last_command_span == 5 and
-            time_span == 10):
-            self.last_command_span = 0
-            print(closest_match["command"])
-            self.last_command_command = closest_match["command"]
-            print(self.last_command_command)
-            self.last_command_device  = closest_match["device" ] 
-            print("IGNORING COMMAND")
-            return
-
-        payload = self.get_command(closest_match, start_time)
-        self.last_command_command = closest_match["command"]
-        self.last_command_device  = closest_match["device" ]
-        self.last_command_span = time_span
+        
         self.client.pub(topic, payload)
         self.publisher.publish(String(data=payload))
         self.get_logger().info(f"Sending message: {payload}")
@@ -343,21 +318,8 @@ class ReadKinectPose(Node):
             if diff < max_diff:
                 max_diff = diff
                 closest_gesture = gesture_time["gesture"]
-        
-        payload = f'{{"command": "{closest_gesture}_{device}.{command}"}}'
-
-        # time_span = closest_match["sentence"]["time_span"]
-        # # if the same command is sent twice in a row within 5 seconds (due to two 5 second clips being added together), and a gesture is missing, do not announce
-        # if (payload == self.last_command and
-        #     self.last_command_span == 5 and
-        #     time_span == 10):
-        #     print("IGNORING COMMAND")
-        #     return payload
 
         if closest_gesture == "":
-            self.respond("no_gesture")
-
-        if (closest_gesture == ""):
             self.respond("no_gesture")
 
         return f'{{"command": "{closest_gesture}_{closest_match["device"]}.{closest_match["command"]}"}}'
@@ -368,11 +330,8 @@ class ReadKinectPose(Node):
         for word in sentence["result"]:
             if word["word"] == match_word:
                 # add half a second to account for processing delay
-                # 3s chosen based on preliminary testing
-                word_relative_time = (sentence_word["start"] - 3) * 10 ** 9
-        
-        if word_relative_time == 0:
-            return math.inf
+                # 0.5s chosen based on preliminary testing
+                word_relative_time = (word["start"] + 0.5) * 10 ** 9
 
         return start_time + word_relative_time
 

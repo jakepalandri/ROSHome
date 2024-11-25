@@ -1,96 +1,88 @@
 #!/usr/bin/env python3
-
+# -*- coding: utf-8 -*-
+ 
 import os
+import sys
 import json
-import string
-import tempfile
-import wave
-import sounddevice as sd
-import whisper
+import queue
+import vosk
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
-import warnings
-
-warnings.filterwarnings("ignore", category=FutureWarning)
-
-class WhisperSpeechRecognition(Node):
+import sounddevice as sd
+ 
+class VoskSpeechRecognition(Node):
     def __init__(self):
         # Set the path to your VOSK model
-        super().__init__("Whisper_Speech_Recognition")
+        super().__init__("vosk_speech_recognition")
         self.pub_audio = self.create_publisher(String, '/speech_to_text', 10)
 
-        self.model = whisper.load_model("base.en")
+        model_path = "/home/jake/ROSHome/ros2_ws/assets/models/vosk-model-en-us-0.42-gigaspeech"
+        self.q = queue.Queue()
  
-        self.process_audio()
+        self.input_dev_num = sd.query_hostapis()[0]['default_input_device']
+        if self.input_dev_num == -1:
+            print('No input device found')
+            raise ValueError('No input device found, device number == -1')
+ 
+        device_info = sd.query_devices(self.input_dev_num, 'input')
+        self.sample_rate = int(device_info['default_samplerate'])
+ 
+        self.model = vosk.Model(model_path)
+        self.speech_recognize()
 
-    def save_audio_to_tempfile(self, audio_data):
-        tmpfile = tempfile.NamedTemporaryFile(delete=False, suffix='.wav', prefix='audio_', dir='.')
-        with wave.open(tmpfile.name, 'wb') as wav_file:
-            wav_file.setnchannels(1)  # Mono audio
-            wav_file.setsampwidth(2)  # 16-bit audio
-            wav_file.setframerate(16000)  # Sample rate
-            wav_file.writeframes(audio_data)
-        return tmpfile.name
-
-    def transcribe_audio(self, audio_data):
-        audio_file = self.save_audio_to_tempfile(audio_data)
+    def stream_callback(self, indata, frames, time, status):
+        if status:
+            print(status, file=sys.stderr)
+        self.q.put(bytes(indata))
+ 
+    def speech_recognize(self):
         try:
-            result = self.model.transcribe(audio_file, language="en", word_timestamps=True)
-            return result
-        finally:
-            os.remove(audio_file)
+            with sd.RawInputStream(samplerate=self.sample_rate, blocksize=16000, device=self.input_dev_num, dtype='int16',
+                                   channels=1, callback=self.stream_callback):
+                print('Started recording')
+                rec = vosk.KaldiRecognizer(self.model, self.sample_rate)
+                start_time_ns = self.get_clock().now().nanoseconds
+                print(start_time_ns)
+
+                # output alternative words in case of misinterpretation
+                rec.SetMaxAlternatives(5)
+                # output words with time stamps
+                rec.SetWords(True)
+
+                print("Vosk is ready to listen!")
+                while True:
+                    data = self.q.get()
+                    if rec.AcceptWaveform(data):
+                        result = rec.FinalResult()
+
+                        print(result)
+
+                        result_dict = json.loads(result)
+                        text = result_dict["alternatives"][0]["text"]
+                        
+                        if len(text) > 0:
+                            print("\033[91mFinal result:\033[0m", text)
+
+                            result_dict["start_time_ns"] = start_time_ns
+                            result_with_time = json.dumps(result_dict)
+
+                            msg = String()
+                            msg.data = result_with_time
+                            self.pub_audio.publish(msg)
+                        
+                        rec.Reset()
  
-    def process_audio(self):
-        accumulated_audio = bytearray()  # Accumulate current 5-second audio chunk
-        previous_audio = bytearray()  # Store previous 5-second audio chunk
-        previous_text = ""  # Store previous 5-second transcription
-
-        with sd.InputStream(dtype='int16', channels=1, samplerate=16000, blocksize=80000) as stream:
-            self.get_logger().info("Recording... Press Ctrl+C to stop.")
-            while rclpy.ok():
-                start_time_ns_5s = self.get_clock().now().nanoseconds
-                start_time_ns_10s = start_time_ns_5s - 5e9
-                indata, overflowed = stream.read(80000)  # 5 seconds at 16 kHz
-
-                if overflowed:
-                    self.get_logger().warning("Warning: Audio buffer overflowed!")
-                
-                # Transcribe the new 5-second audio chunk
-                accumulated_audio.extend(indata)
-                current = self.transcribe_audio(accumulated_audio)
-                current_text = current["text"].translate(str.maketrans('', '', string.punctuation)).lower().strip()
-                previous_text = current_text
-                self.get_logger().info(f"Current 5-second transcription:{current_text}")
-
-                if current_text != "":
-                    current["start_time_ns"] = start_time_ns_5s
-                    current["time_span"] = 5
-                    current_json = json.dumps(current)
-                    msg = String()
-                    msg.data = json.dumps(current, indent=2)
-                    self.pub_audio.publish(msg)
-
-                # Combine with the previous chunk to form a 10-second audio
-                combined_audio = previous_audio + accumulated_audio
-                combined = self.transcribe_audio(combined_audio)
-                combined_text = combined["text"].translate(str.maketrans('', '', string.punctuation)).lower().strip()
-
-                self.get_logger().info(f"Combined 10-second transcription: {combined_text}")
-
-                if combined_text != "" and previous_text != combined_text:
-                    combined["start_time_ns"] = start_time_ns_10s
-                    combined["time_span"] = 10
-                    combined_json = json.dumps(combined)
-                    msg = String()
-                    msg.data = combined_json
-                    self.pub_audio.publish(msg)
-
-                previous_audio = accumulated_audio
-                accumulated_audio = bytearray()
+        except KeyboardInterrupt as e:
+            print("\nStopping the VOSK speech recognition...")
+            raise e
+        except Exception as e:
+            print(f"An error occurred: {type(e).__name__}: {str(e)}")
+ 
 
 def main(args=None):
     rclpy.init(args=args)
-    recognizer = WhisperSpeechRecognition()
+    recognizer = VoskSpeechRecognition()
+    recognizer.speech_recognize()
     rclpy.spin(recognizer)
     rclpy.shutdown()
