@@ -34,7 +34,8 @@ sudo apt-key del 7fa2af80
 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/cuda-keyring_1.1-1_all.deb
 sudo dpkg -i cuda-keyring_1.1-1_all.deb
 sudo apt-get update
-sudo apt-get -y install cuda
+sudo apt-get -y install cuda-toolkit # maybe? idk what ended up working
+# might've been this: https://linuxconfig.org/how-to-install-cuda-on-ubuntu-20-04-focal-fossa-linux
 
 # sudo apt-get -y install nvidia-gds
 
@@ -90,6 +91,7 @@ cd iai_kinect2_opencv4
 rosdep install -r --from-paths .
 cd ~/catkin_ws
 sudo bash -c 'echo -e "set( CMAKE_CXX_STANDARD 14)\n$(cat src/CMakeLists.txt)" > src/CMakeLists.txt'
+sr1
 catkin_make -DCMAKE_BUILD_TYPE="Release"
 
 sudo apt-get install nvidia-modprobe opencl-headers
@@ -98,7 +100,7 @@ sudo ldconfig
 
 # ROS2 INSTALLATION
 locale  # check for UTF-8
-
+# if not, do this
 sudo apt update && sudo apt install locales
 sudo locale-gen en_US en_US.UTF-8
 sudo update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
@@ -120,55 +122,6 @@ sudo apt -y upgrade
 sudo apt -y install ros-foxy-desktop python3-argcomplete
 sudo apt -y install ros-dev-tools
 
-# CHOOSE ONE - FROM SOURCE - DO NOT DO
-# sudo apt update && sudo apt install -y \
-#   libbullet-dev \
-#   python3-pip \
-#   python3-pytest-cov \
-#   ros-dev-tools
-
-# install some pip packages needed for testing
-# python3 -m pip install -U \
-#   argcomplete \
-#   flake8-blind-except \
-#   flake8-builtins \
-#   flake8-class-newline \
-#   flake8-comprehensions \
-#   flake8-deprecated \
-#   flake8-docstrings \
-#   flake8-import-order \
-#   flake8-quotes \
-#   pytest-repeat \
-#   pytest-rerunfailures \
-#   pytest
-
-# install Fast-RTPS dependencies
-# sudo apt install --no-install-recommends -y \
-#   libasio-dev \
-#   libtinyxml2-dev
-
-# install Cyclone DDS dependencies
-# sudo apt install --no-install-recommends -y \
-#   libcunit1-dev
-
-# mkdir -p ~/ros2_foxy/src
-# cd ~/ros2_foxy
-# vcs import --input https://raw.githubusercontent.com/ros2/ros2/foxy/ros2.repos src
-
-# sudo apt -y upgrade
-
-# sudo rosdep init
-# rosdep update
-# rosdep install --from-paths src --ignore-src -y --skip-keys "fastcdr rti-connext-dds-5.3.1 urdfdom_headers"
-
-# colcon build --symlink-install --packages-skip ros1_bridge
-
-# ROS1 BRIDGE INSTALLATION - SOURCE - NOPE
-# cd ~
-# source /opt/ros/noetic/setup.bash
-# source ./ros2_foxy/install/local_setup.bash
-# source catkin_ws/devel/setup.bash
-# colcon build --symlink-install --packages-select ros1_bridge --cmake-force-configure
 echo "alias sr2='source /opt/ros/foxy/setup.bash'" >> ~/.bashrc
 
 # ROS1 BRIDGE INSTALLATION - DEBIAN - YEP
@@ -177,3 +130,26 @@ sudo apt install ros-foxy-ros1-bridge
 
 # THIS IS SPECIFIC TO MY SETUP WITH THE ROSHome FOLDER IN ~ 
 echo "alias srws='source ~/ROSHome/ros2_ws/install/setup.bash'" >> ~/.bashrc
+
+# install python modules
+sudo apt -y install python3-pip
+pip install ultralytics
+pip install paho-mqtt
+pip install watchdog
+pip install playsound
+pip install sounddevice
+sudo apt-get -y install libportaudio2
+pip install vosk
+
+# download model from vosk
+# alternative models available at https://alphacephei.com/vosk/models
+cd ~/ROSHome/ros2_ws/assets/models
+wget -q --show-progress https://alphacephei.com/vosk/models/vosk-model-en-us-0.42-gigaspeech.zip
+unzip -q vosk-model-en-us-0.42-gigaspeech.zip
+rm vosk-model-en-us-0.42-gigaspeech.zip
+
+# if using whisper branch
+pip install openai-whisper
+
+# if you want to test mqtt commands without Home Assistant set up then:
+sudo apt -y install mosquitto-clients
