@@ -1,4 +1,5 @@
 // Variables
+// CUSTOMISABLE
 const backendURL = "http://192.168.0.100:5000"; // on lab router network
 // const backendURL = "http://192.168.0.162:5000"; // on home network
 const toggleButton = document.getElementById("toggleButton") as HTMLButtonElement;

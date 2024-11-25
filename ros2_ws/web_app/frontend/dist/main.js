@@ -61,6 +61,7 @@ toggleButton.addEventListener("click", function () { return __awaiter(void 0, vo
                 viewCommandsDiv.style.display = addCommandsVisible ? "block" : "none";
                 // Update button text
                 toggleButton.textContent = addCommandsVisible ? "Add Commands" : "View Commands";
+                message.innerText = "";
                 return [4 /*yield*/, loadCommands()];
             case 1:
                 _a.sent();
@@ -122,23 +123,6 @@ var loadCommands = function () { return __awaiter(void 0, void 0, void 0, functi
         }
     });
 }); };
-// // Set submission text and enable/disable submission button to confirm values to the user
-// const setSubmissionText = () => {
-//     if (commandInput.value !== "" && actionInput.value !== "") {
-//         submissionText.innerHTML = `Command: ${commandInput.value} <br>`;
-//         if (commandInput.value.includes("that")) {
-//             submissionText.innerHTML += `Action: [gesture]_${actionInput.value}`;
-//         }
-//         else {
-//             submissionText.innerHTML += `Action: ${actionInput.value}`;
-//         }
-//         submissionButton.disabled = false;
-//     }
-//     else {
-//         submissionText.innerHTML = "";
-//         submissionButton.disabled = true;
-//     }
-// }
 // Reset input fields
 var resetInputs = function () {
     deviceTypeInput.value = "";
@@ -217,7 +201,7 @@ commandForm.addEventListener("submit", function (event) { return __awaiter(void 
             case 2:
                 response = _a.sent();
                 if (!response.ok) return [3 /*break*/, 4];
-                message.innerText = "Command added successfully!";
+                message.innerText = "Commands set successfully!";
                 resetInputs();
                 return [4 /*yield*/, loadCommands()];
             case 3:
