@@ -4,6 +4,7 @@ class MqttClient:
     def __init__(self):
         self.clientId = "kinect_ros_client"
         self.port = 1883
+        # CUSTOMISABLE
         # self.broker = "localhost"
         self.broker = "192.168.0.10"
         self.connect()

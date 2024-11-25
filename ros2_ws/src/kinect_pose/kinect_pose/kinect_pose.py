@@ -40,6 +40,7 @@ class Point(IntEnum):
 class ReadKinectPose(Node):
     def __init__(self):
         super().__init__('read_kinect_pose')
+        # CUSTOMISABLE
         self.min = [-2000, -1000, 0000]
         self.max = [ 2000,  2000, 5000]
 
@@ -80,6 +81,8 @@ class ReadKinectPose(Node):
 
         left_gesture, right_gesture, left_distance, right_distance = self.determine_gesture(depth, rect_matrix, result_keypoint, isPerson)
         self.store_gesture(left_gesture, right_gesture, left_distance, right_distance, gesture_time)
+
+        # UNCOMMENT THIS TO ALLOW GESTURE-ONLY COMMANDS (NO VOICE REQUIRED)
         # self.send_gesture(left_gesture, right_gesture)
 
     def determine_gesture(self, depth, rect_matrix, result_keypoint, isPerson):
@@ -133,6 +136,7 @@ class ReadKinectPose(Node):
         left_shldr_distance  = np.linalg.norm(left_wrist_3d  - left_shldr_3d )
 
         # 6c. Set extension distance thresholds
+        # CUSTOMISABLE
         hip_threshold   = 500
         shldr_threshold = 400
 
@@ -140,18 +144,6 @@ class ReadKinectPose(Node):
         # NEED A MINIMUM EXTENSION THRESHOLD -  CURRENTLY 500mm
         # DOESN'T ACCOUNT FOR IF THE PERSON'S SHOULDERS AND HIPS AREN'T VISIBLE
         # OR IF ONE SHOULDER AND OPPOSITE HIP ARE VISIBLE (DIAGONAL) - THIS SEEMS LIKE A RARE EDGE CASE
-        # print("LWrist:    ", left_wrist_3d       )
-        # print("LHip:      ", left_hip_3d         )
-        # print("LSldr:     ", left_shldr_3d       )
-        # print("RWrist:    ", right_wrist_3d      )
-        # print("RHip:      ", right_hip_3d        )
-        # print("RSldr:     ", right_shldr_3d      )
-        # print("LHipDist:  ", left_hip_distance   )
-        # print("RHipDist:  ", right_hip_distance  )
-        # print("LSldrDist: ", left_shldr_distance )
-        # print("RSldrDist: ", right_shldr_distance)
-        # print("LVector:   ", left_vector         )
-        # print("RVector:   ", right_vector        )
 
         # If hips aren't visible, use distance from shoulders
         left_distance  = left_hip_distance
@@ -175,38 +167,38 @@ class ReadKinectPose(Node):
 
         return left_gesture, right_gesture, left_distance, right_distance
 
-    # def send_gesture(self, left_gesture, right_gesture):
-    #     if left_gesture == "none" and right_gesture == "none":
-    #         return
+    def send_gesture(self, left_gesture, right_gesture):
+        if left_gesture == "none" and right_gesture == "none":
+            return
 
-    #     # 8. Prepare gesture message
-    #     topic = "kinect_pose"
-    #     gesture = f"left_arm_{left_gesture}_right_arm_{right_gesture}"
-    #     if left_gesture == "none":
-    #         gesture = f"right_arm_{right_gesture}"
-    #     elif right_gesture == "none":
-    #         gesture = f"left_arm_{left_gesture}"
+        # 8. Prepare gesture message
+        topic = "kinect_pose"
+        gesture = f"left_arm_{left_gesture}_right_arm_{right_gesture}"
+        if left_gesture == "none":
+            gesture = f"right_arm_{right_gesture}"
+        elif right_gesture == "none":
+            gesture = f"left_arm_{left_gesture}"
 
-    #     payload = f'{{"gesture": "{gesture}"}}'
+        payload = f'{{"gesture": "{gesture}"}}'
 
-    #     # 9. Send gesture message
-    #     # 9a. If new gesture, reset timer, needs to be held for 2 frames
-    #     if self.last_gesture != gesture:
-    #         print(f"old gesture: {self.last_gesture} new gesture: {gesture}")
-    #         self.frames_holding_gesture = 1
-    #         self.last_gesture = gesture
-    #         return
+        # 9. Send gesture message
+        # 9a. If new gesture, reset timer, needs to be held for 2 frames
+        if self.last_gesture != gesture:
+            print(f"old gesture: {self.last_gesture} new gesture: {gesture}")
+            self.frames_holding_gesture = 1
+            self.last_gesture = gesture
+            return
 
-    #     # 9b. If gesture has been held for less than 2 frames, increment
-    #     if self.frames_holding_gesture < 2:
-    #         print(f"frames holding gesture: {str(self.frames_holding_gesture)}")
-    #         self.frames_holding_gesture += 1
-    #         return
+        # 9b. If gesture has been held for less than 2 frames, increment
+        if self.frames_holding_gesture < 2:
+            print(f"frames holding gesture: {str(self.frames_holding_gesture)}")
+            self.frames_holding_gesture += 1
+            return
 
-    #     # 9c. Otherwise, send the message
-    #     self.client.pub(topic, payload)
-    #     self.publisher.publish(String(data=payload))
-    #     print(f"Sending message: {payload}")
+        # 9c. Otherwise, send the message
+        self.client.pub(topic, payload)
+        self.publisher.publish(String(data=payload))
+        print(f"Sending message: {payload}")
 
     def store_gesture(self, left_gesture, right_gesture, left_distance, right_distance, gesture_time):
         # only store the last 10 seconds of gestures
@@ -254,19 +246,38 @@ class ReadKinectPose(Node):
         send_command = False
         starts_with_home = False
 
+        # Check for wake word to respond if an invalid command is given
+        # If a wake word is not given, a valid command will still work
+        # However, if an invalid command is given, then there will be no feedback
+        # This is to allow people to use commands even if they forget the wake word
+        # But it will not give feedback for regular speech not intended as a command
         for sentence in speech_json["alternatives"]:
             text = sentence["text"]
             if text.startswith("home"):
                 starts_with_home = True
 
+        # check each possible sentence option
         for sentence in speech_json["alternatives"]:
             text = sentence["text"]
             possible_matches = []
 
+            # check each of the possible device/command combinations to see if a valid command format is matched
             for device in self.commands.keys():
                 for command in self.commands[device]:
+                    # Regex format:     *any speech* + [COMMAND] + *any speech* + "THAT" + *any speech* + [DEVICE] + *any speech*
+                    # Simple example:   "home, TURN ON THAT LIGHT"
+                    # Complex example:  "home, could you please TURN ON the power to THAT big LIGHT over there for me, thanks"
                     regex = rf".*\b{command}\b.*\bthat\b.*\b{device}\b.*"
+
+                    # Regex format:     *any speech* + [COMMAND] + *any speech* + "ALL/EVERY" + *any speech* + [DEVICE](s) + *any speech*
+                    # Simple example:   "home, TURN OFF EVERY LIGHT"
+                    # Simple example:   "home, TURN OFF ALL LIGHTs"
+                    # Complex example:  "home, could you please TURN OFF the power to EVERY single LIGHT for me"
+                    # Complex example:  "home, could you please TURN OFF the power to ALL of those LIGHTs for me"
                     regex_all = rf".*\b{command}\b.*\b(all|every)\b.*{device}s?\b.*"
+                    
+                    # Check for ALL/EVERY match first
+                    # If a user uses ALL/EVERY keyword, it should always trigger all devices
                     if re.match(regex_all, text):
                         possible_matches.append({
                             "command": command,
@@ -275,6 +286,7 @@ class ReadKinectPose(Node):
                             "time": self.word_time(device, sentence),
                             "sentence": sentence
                         })
+                    # If not, check for a single device command match
                     elif re.match(regex, text):
                         possible_matches.append({
                             "command": command,
@@ -287,6 +299,10 @@ class ReadKinectPose(Node):
             if len(possible_matches) == 0:
                 continue
 
+            # Select the command that has the latest matching device keyword
+            # This is so that if a user corrects themselves mid-sentence, it selects the correct command
+            # Example: "Home, turn on that light, I mean, TV"
+            # This will turn on a TV, not a light
             possible_matches.sort(key=lambda x: x["time"], reverse=True)
             closest_match = possible_matches[0]
             send_command = True
@@ -304,6 +320,10 @@ class ReadKinectPose(Node):
         self.get_logger().info(f"Sending message: {payload}")
     
     def get_command(self, closest_match, start_time = 0):
+        # Convert command into format for Home Assistant
+        # Format:   Direction_deviceType.command
+        # Example:  ceiling_light.turn_on
+        # Example:  all_lights.turn_off
         closest_match["command"] = closest_match["command"].replace(" ", "_")
         closest_match["device"] = closest_match["device"].replace(" ", "_")
         if (closest_match["all"]):
@@ -311,6 +331,7 @@ class ReadKinectPose(Node):
         
         that_time = self.word_time("that", closest_match["sentence"], start_time)
 
+        # Get gesture closest time at which "that" is said to sync gesture and voice commands
         closest_gesture = ""
         max_diff = math.inf
         for gesture_time in self.gesture_history:
@@ -336,6 +357,7 @@ class ReadKinectPose(Node):
         return start_time + word_relative_time
 
     def respond(self, reason):
+        # Give feedback for bad command or no gesture
         try:
             playsound(f"assets/audio/{reason}.mp3")
         except Exception as e:
@@ -347,6 +369,9 @@ class ReadKinectPose(Node):
         self.get_logger().info(f"Commands reloaded:{json.dumps(self.commands, indent=2)}")
 
     def min_depth(self, depth, keypoint):
+        # Get minimum depth around a 5 pixel radius of the point determined by YOLO
+        # 5 pixel radius given to account for error in YOLO position
+        # to ensure a wall behind the user is not selected for depth
         diameter = 10
         x, y = map(round, keypoint)
         min_depth = math.inf
@@ -361,6 +386,7 @@ class ReadKinectPose(Node):
         return min_depth
 
     def pixel_to_world(self, pixel, rect_matrix, depth):
+        # convert pixel coordinates from YOLO to world coordinates relative to Kinect camera
         pixel_homogeneous = np.array([pixel[0], pixel[1], 1])
         world_coords = np.matmul(np.linalg.inv(rect_matrix), pixel_homogeneous)
         world_coords *= depth
@@ -396,6 +422,7 @@ class ReadKinectPose(Node):
         return extended_point
 
     def pointing_at(self, origin, vector):
+        # get wall that user is pointing at
         extended_point = self.extend_vector_to_boundary(origin, vector)
 
         if extended_point[0] == self.min[0]:
