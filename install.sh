@@ -131,7 +131,7 @@ sudo apt install ros-foxy-ros1-bridge
 # THIS IS SPECIFIC TO MY SETUP WITH THE ROSHome FOLDER IN ~ 
 echo "alias srws='source ~/ROSHome/ros2_ws/install/setup.bash'" >> ~/.bashrc
 
-# install python modules
+# install python modules and other required modules for the code to run
 sudo apt -y install python3-pip
 pip install ultralytics
 pip install paho-mqtt
@@ -140,6 +140,13 @@ pip install playsound
 pip install sounddevice
 sudo apt-get -y install libportaudio2
 pip install vosk
+
+# required for web app
+pip install flask
+pip install flask_cors
+sudo apt -y install node-typescript
+sudo apt -y install nodejs npm
+sudo npm install -g live-server
 
 # download model from vosk
 # alternative models available at https://alphacephei.com/vosk/models
@@ -150,6 +157,7 @@ rm vosk-model-en-us-0.42-gigaspeech.zip
 
 # if using whisper branch
 pip install openai-whisper
+sudo apt -y install ffmpeg
 
 # if you want to test mqtt commands without Home Assistant set up then:
 sudo apt -y install mosquitto-clients
