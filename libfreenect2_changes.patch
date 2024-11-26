@@ -1,0 +1,69 @@
+diff --git a/src/opencl_depth_packet_processor.cpp b/src/opencl_depth_packet_processor.cpp
+index d8db14d..2083394 100644
+--- a/src/opencl_depth_packet_processor.cpp
++++ b/src/opencl_depth_packet_processor.cpp
+@@ -251,7 +251,9 @@ public:
+     newIrFrame();
+     newDepthFrame();
+ 
++#if !defined(CL_ICDL_VERSION)
+     const int CL_ICDL_VERSION = 2;
++#endif
+     typedef cl_int (*icdloader_func)(int, size_t, void*, size_t*);
+ #ifdef _MSC_VER
+ #pragma warning(push)
+diff --git a/src/opencl_kde_depth_packet_processor.cpp b/src/opencl_kde_depth_packet_processor.cpp
+index 98dbdff..a0d1769 100644
+--- a/src/opencl_kde_depth_packet_processor.cpp
++++ b/src/opencl_kde_depth_packet_processor.cpp
+@@ -259,7 +259,9 @@ public:
+     newIrFrame();
+     newDepthFrame();
+ 
++#if !defined(CL_ICDL_VERSION)
+     const int CL_ICDL_VERSION = 2;
++#endif
+     typedef cl_int (*icdloader_func)(int, size_t, void*, size_t*);
+ #ifdef _MSC_VER
+ #pragma warning(push)
+diff --git a/tools/streamer_recorder/CMakeLists.txt b/tools/streamer_recorder/CMakeLists.txt
+index 77f203f..9b9a265 100644
+--- a/tools/streamer_recorder/CMakeLists.txt
++++ b/tools/streamer_recorder/CMakeLists.txt
+@@ -94,6 +94,10 @@ ADD_EXECUTABLE(ProtonectSR
+   ${ProtonectSR_src}
+ )
+ 
++SET_TARGET_PROPERTIES(ProtonectSR PROPERTIES
++	CXX_STANDARD 14
++)
++
+ TARGET_LINK_LIBRARIES(ProtonectSR
+   ${ProtonectSR_LIBRARIES}
+ )
+diff --git a/tools/streamer_recorder/recorder.cpp b/tools/streamer_recorder/recorder.cpp
+index 89afc39..d080f30 100644
+--- a/tools/streamer_recorder/recorder.cpp
++++ b/tools/streamer_recorder/recorder.cpp
+@@ -78,7 +78,7 @@ void Recorder::initialize()
+   /////////////////////////////////////////////////////////////////
+ 
+   // record image: define compression parameters and frame counter
+-  img_comp_param.push_back(CV_IMWRITE_JPEG_QUALITY); //specify the compression technique
++  img_comp_param.push_back(cv::IMWRITE_JPEG_QUALITY); //specify the compression technique
+   img_comp_param.push_back(100); //specify the compression quality
+   frameID = 0;
+ 
+diff --git a/tools/streamer_recorder/streamer.cpp b/tools/streamer_recorder/streamer.cpp
+index 9cd0333..a81b523 100644
+--- a/tools/streamer_recorder/streamer.cpp
++++ b/tools/streamer_recorder/streamer.cpp
+@@ -36,7 +36,7 @@ void Streamer::initialize()
+   servAddress = SERVER_ADDRESS;
+   servPort = Socket::resolveService(SERVER_PORT, "udp"); // Server port
+ 
+-  compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
++  compression_params.push_back(cv::IMWRITE_JPEG_QUALITY);
+   compression_params.push_back(jpegqual);
+ }
+ 
