@@ -9,16 +9,16 @@ sudo apt -y install curl # if you haven't already installed curl
 curl -s https://raw.githubusercontent.com/ros/rosdistro/master/ros.asc | sudo apt-key add -
 
 sudo apt update
-sudo apt -y install ros-noetic-desktop-full
+sudo apt -y install ros-noetic-desktop-full # this may need a second attempt if it errors
 sudo apt -y install python3-rosdep python3-rosinstall python3-rosinstall-generator python3-wstool build-essential
 
 sudo rosdep init
 rosdep update
 
 # ROS1 Environment Configuring
-source /opt/ros/noetic/setup.bash
 alias sr1='source /opt/ros/noetic/setup.bash'
 echo "alias sr1='source /opt/ros/noetic/setup.bash'" >> ~/.bashrc
+sr1
 mkdir -p ~/catkin_ws/src
 cd ~/catkin_ws/
 catkin_make
@@ -26,7 +26,6 @@ source devel/setup.bash
 echo "alias srk='source ~/catkin_ws/devel/setup.bash'" >> ~/.bashrc
 
 # verify installation
-sr1
 roscore
 # Ctrl+C to exit
 
@@ -37,7 +36,7 @@ roscore
 # Press Ctrl-C to interrupt
 # Done checking log file disk usage. Usage is <1GB.
 
-# started roslaunch server http://jake-XPS-15-9510:34723/
+# started roslaunch server http://jake-XPS-15-9510:34723/ ######################### THIS IS IN BOLD
 # ros_comm version 1.17.0
 
 
@@ -51,17 +50,17 @@ roscore
 # NODES
 
 # auto-starting new master
-# process[master]: started with pid [37833]
-# ROS_MASTER_URI=http://jake-XPS-15-9510:11311/
+# process[master]: started with pid [37833] ######################### THIS IS IN BOLD
+# ROS_MASTER_URI=http://jake-XPS-15-9510:11311/ ######################### THIS IS IN BOLD
 
-# setting /run_id to f02fa19c-abff-11ef-b9f6-552c6127c39a
-# process[rosout-1]: started with pid [37843]
+# setting /run_id to f02fa19c-abff-11ef-b9f6-552c6127c39a ######################### THIS IS IN BOLD
+# process[rosout-1]: started with pid [37843] ######################### THIS IS IN BOLD
 # started core service [/rosout]
 
 # CUDA INSTALLATION
 cd ~
 sudo apt update
-sudo apt -y install nvidia-cuda-toolkit
+sudo apt -y install nvidia-cuda-toolkit 
 
 # https://github.com/OpenKinect/libfreenect2/issues/1196
 # remove previous gcc-9 and g++-9 by :
@@ -73,16 +72,6 @@ sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50
 sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 50
 sudo update-alternatives --config gcc
 sudo update-alternatives --config g++
-
-# verify installation
-nvcc --version
-
-# Expected output:
-
-# nvcc: NVIDIA (R) Cuda compiler driver
-# Copyright (c) 2005-2019 NVIDIA Corporation
-# Built on Sun_Jul_28_19:07:16_PDT_2019
-# Cuda compilation tools, release 10.1, V10.1.243
 
 wget http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run
 sudo sh cuda_10.1.243_418.87.00_linux.run
@@ -99,6 +88,19 @@ sudo sh cuda_10.1.243_418.87.00_linux.run
 
 # Select install
 
+# verify installation
+nvcc --version
+
+# Expected output:
+
+# nvcc: NVIDIA (R) Cuda compiler driver
+# Copyright (c) 2005-2019 NVIDIA Corporation
+# Built on Sun_Jul_28_19:07:16_PDT_2019
+# Cuda compilation tools, release 10.1, V10.1.243
+
+# remove used run file
+rm cuda_10.1.243_418.87.00_linux.run
+
 # Install updated drivers 
 sudo apt-get -y install linux-headers-$(uname -r)
 sudo apt-key del 7fa2af80
@@ -114,6 +116,16 @@ echo "export PATH='/usr/local/cuda/bin:${PATH}'" >> ~/.bashrc
 
 export CPATH=$CPATH:$HOME/NVIDIA_CUDA-10.1_Samples/common/inc
 echo "export CPATH=$CPATH:$HOME/NVIDIA_CUDA-10.1_Samples/common/inc" >> ~/.bashrc
+
+# verify keyring installation
+dpkg -l | grep cuda-keyring
+
+# Expected output:
+#    |THIS IS RED |
+# ii  cuda-keyring                                    1.1-1                                 all          GPG keyring for the CUDA repository
+
+# remove used installer
+rm cuda-keyring_1.1-1_all.deb
 
 # LIBFREENECT2 INSTALLATION WITH CHANGE IN CMAKE FOR KINECT2 BRIDGE
 git clone https://github.com/OpenKinect/libfreenect2.git
@@ -154,13 +166,15 @@ cd ~/catkin_ws/src/
 git clone https://github.com/paul-shuvo/iai_kinect2_opencv4.git
 cd iai_kinect2_opencv4
 rosdep install -r --from-paths .
-sudo bash -c 'echo -e "set( CMAKE_CXX_STANDARD 14)\n$(cat CMakeLists.txt)" > CMakeLists.txt'
 cd ~/catkin_ws
+sudo bash -c 'echo -e "set( CMAKE_CXX_STANDARD 14)\n$(cat src/CMakeLists.txt)" > src/CMakeLists.txt'
 catkin_make -DCMAKE_BUILD_TYPE="Release"
 
 sudo apt-get -y install nvidia-modprobe opencl-headers
 echo "/usr/local/cuda/lib64" | sudo tee /etc/ld.so.conf.d/cuda.conf
 sudo ldconfig
+
+# we will verify this worked when starting the ROS bridge as described in usage (not setup) instructions, skip to there if you want to check now
 
 # ROS2 INSTALLATION
 locale  # check for UTF-8
@@ -219,7 +233,7 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-a
 
 # CHOOSE ONE - DEBIAN - THIS
 sudo apt update
-sudo apt -y upgrade
+sudo apt -y upgrade # this may need a second attempt if it errors
 sudo apt -y install ros-foxy-desktop python3-argcomplete
 sudo apt -y install ros-dev-tools
 
