@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 // Variables
+// CUSTOMISABLE
 var backendURL = "http://192.168.0.100:5000"; // on lab router network
 // const backendURL = "http://192.168.0.162:5000"; // on home network
 var toggleButton = document.getElementById("toggleButton");
