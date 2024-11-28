@@ -1,16 +1,27 @@
 kinect_cal_data/*.png
 *.log
-unswthesis-2.1/*.gz
-unswthesis-2.1/*.aux
-unswthesis-2.1/*.bbl
-unswthesis-2.1/*.blg
-unswthesis-2.1/*.fdb_latexmk
-unswthesis-2.1/*.fls
-unswthesis-2.1/*.lof
-unswthesis-2.1/*.log
-unswthesis-2.1/*.lot
-unswthesis-2.1/*.toc
-unswthesis-2.1/*.out
+Thesis A LaTex/*.gz
+Thesis A LaTex/*.aux
+Thesis A LaTex/*.bbl
+Thesis A LaTex/*.blg
+Thesis A LaTex/*.fdb_latexmk
+Thesis A LaTex/*.fls
+Thesis A LaTex/*.lof
+Thesis A LaTex/*.log
+Thesis A LaTex/*.lot
+Thesis A LaTex/*.toc
+Thesis A LaTex/*.out
+Thesis B LaTex/*.gz
+Thesis B LaTex/*.aux
+Thesis B LaTex/*.bbl
+Thesis B LaTex/*.blg
+Thesis B LaTex/*.fdb_latexmk
+Thesis B LaTex/*.fls
+Thesis B LaTex/*.lof
+Thesis B LaTex/*.log
+Thesis B LaTex/*.lot
+Thesis B LaTex/*.toc
+Thesis B LaTex/*.out
 .vscode
 ros2_ws/build
 ros2_ws/install
