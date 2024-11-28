@@ -17,7 +17,7 @@ No units were ever sold.
 Despite its failure on the open market, the device received a lot of attention and the public began to imagine a future where homes would be interactive.
 
 Eight years later, in 1975, a group of engineers from Scotland released the X10 protocol.
-Capable of controlling up to 256 devices on a single circuit, X10 sent messages to devices through a property's existing AC electrical wiring.
+Capable of controlling up to 256 devices on a single circuit, X10 sent messages to devices through a property's existing Alternating current (AC) electrical wiring.
 At the time, this was an efficient way to send basic signals through large spaces before the widespread adoption of wireless technology in all electronic devices.
 It later advanced to be controllable from a computer, enabling users to schedule events and run decision-based sequences.
 The protocol formed the basis for many domestic control installations for several decades and was one of the first protocols to completely cover the home automation spectrum, with power, security and lighting~\cite{X10}.
@@ -98,7 +98,7 @@ Additionally, another limitation of this method, which was not outlined in this 
 To solve these downfalls of existing implementations, the authors took a different approach, utilising AI to identify people through a camera in a living space, enabling them to differentiate between objects and people.
 However, there are a couple of areas that they did not explore that were within reach using the setup that they had implemented and that this thesis intends to expand upon.
 
-A limitation regarding their investigation was that the authors only used the sensors as a toggle for LEDs with the aim of reducing unnecessary energy use.
+A limitation regarding their investigation was that the authors only used the sensors as a toggle for light emitting diodes (LEDs) with the aim of reducing unnecessary energy use.
 Furthermore, to identify people in the camera, they used You only look once (Yolo), a computer vision AI model for used object detection, classification, and segmentation, which also has a built-in ``skeletonisation'' feature, allowing you to track a person's posture and make more intelligent decisions based on a person's movements.
 These two ideas present an opportunity to fill a potential gap in the market making more intelligent decisions in the home using existing technology and real-world implementations.
 Consequently, this thesis aims to implement a system capable of executing more complex tasks such as controlling other smart devices in the house like a television or blinds with more potential states than just off and on.
@@ -116,12 +116,12 @@ Moreover, the authors discuss integration with custom smart home dashboards and 
 Futher research exists into potential methods of person tracking, human action recognition and behaviour analysis using cameras in the home~\cite{Chaa13}.
 Here, there is more of a focus on using this technology to support the elderly and the disabled, through ambient assisted living (AAL) to ``improv[e] their quality of life and [maintain] their independence''~\cite{Chaa13}.
 
-A. Chaaraoui et al. discuss their deployment with both RGB cameras collecting information and recognising ``key poses'' and hand gestures by creating silhouettes of the person, and also by using RGB-D cameras using the depth information to more accurately track movements.
-They were able to achieve this using a Microsoft Kinect camera and depth sensor ``with low-cost and real-time performance'', which is the same sensor that was used for preliminary testing in this thesis, as will be covered in more detail in Chapter~\ref{ch:project_prep}.
+A. Chaaraoui et al. discuss their deployment with both red, green and blue (RGB) cameras collecting information and recognising ``key poses'' and hand gestures by creating silhouettes of the person, and also by using red, green, blue and depth (RGB-D) cameras using the depth information to more accurately track movements.
+They were able to achieve this using a Microsoft Kinect camera and depth sensor ``with low-cost and real-time performance'', which is the same sensor that was used for the development and deployment of the custom home automation system in this thesis, as will be covered in more detail in Chapter~\ref{ch:methodology}.
 This existing deployment shows promising signs that the proposed setup should work smoothly in a home environment.
 While they were able to get these systems working in real-time, recognising primitive human actions such as standing, walking, sitting and falling, there was no mention in the paper of actual integration with home devices.
 
-In 2000, J. Krumm et al. followed very similar processes, using background subtraction to create silhouettes of people and overlaying depth data over the top of these cutouts through stereo images~\cite{Krum00}.
+In 2000, J. Krumm et al. followed very similar processes, using background subtraction to create silhouettes of people and overlayinbvg depth data over the top of these cutouts through stereo images~\cite{Krum00}.
 However, due to their early adoption of the technology they were somewhat limited by the computational power of computers during this period and had to run far more complicated and unwieldy setups that would not be suitable for a real home deployment today.
 This meant that their trackers ran at only 3.5 Hz, even with the computational load shared between three computers, and often had trouble tracking more than three people at a time or people wearing similarly coloured clothing.
 
@@ -145,9 +145,8 @@ The classification then defines the action that the system should take, sending 
     \label{fig:hand_gestures}
 \end{figure}
 
-Using this technique, they were able to achieve an 88\% accuracy rate in recognising the gestures.
-This is an insufficient accuracy rate for a real-world deployment, as users would have to repeat the gesture multiple times at least one in every 10 attempts in order to get the desired result.
-Additionally, this only worked when users were giving gestures within 65cm from the camera, and only within a 40cm range.
+Using this technique, they were able to achieve an 88\% accuracy rate in recognising the gestures, a promising result for an early-stage development research project.
+However, this only worked when users were giving gestures within 65cm from the camera, and only within a 40cm range.
 This is not practical for day-to-day use as this would either require dozens of cameras per room, spread out every 1.3m, or it would require users to get up from wherever they are in the room and move to the camera in order to control their devices.
 In this case, controlling their devices manually may be equally as convenient.
 Due to these limitations, tracking gestures, only via hand movements, does not appear to be a viable solution for smart home automation, and full body tracking may be required to make this technology more practical for everyday use.
@@ -157,7 +156,7 @@ Implementing a system to track wearable devices opens up many possibilities for 
 In fact, using the wearable device, T. Starner et al. were able to track the user's gestures against control gestures, which measure continuous input from the user, with an accuracy of 95\% and user-defined gestures with an accuracy of 97\%~\cite{Star00}.
 
 Using a device that interacts directly with the user's body, will significantly increase the accuracy of gesture recognition, as the device is able to measure its own movements, and hence the user, as opposed to a potentially distant camera that attempts to infer the user's movements based on depth data.
-However, this creates a significant hurdle as the user must be wearing the device at all times in order to control their devices, which significantly impedes the user experience and reduces the inconvenience that this technology is supposed to alleviate.
+However, this creates a significant hurdle as the user must be wearing the device at all times in order to control their devices, which significantly impedes the user experience and increases the inconvenience that this technology is supposed to alleviate.
 
 \subsection{Behaviour Monitoring for Elderly Care}
 In a 2017 paper, ``A Behaviour Monitoring System (BMS) for Ambient Assisted Living,'' S. Eisa, and A. Moreira constructed an environment that could monitor the behaviour of elderly people in their homes~\cite{Eisa17}.

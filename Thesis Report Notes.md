@@ -76,31 +76,31 @@ check canva or notes
 # Abstract
 ## Introduction
 ## Literature Review
-- Copy + paste literature review from Thesis A
-- Update existing literature review
-    - Voice commands, etc.
+- [x] Copy + paste literature review from Thesis A
+- [ ] Update existing literature review
+    -  [ ] Voice commands, etc.
 ## Methodology
-- Talk about ROS and how devices interface, speech tools, models etc.
-- Tech Stack
-- Physical Setup Diagram
+- [ ] Talk about ROS and how devices interface, speech tools, models etc.
+- [ ] Tech Stack
+- [ ] Physical Setup Diagram
 ## Evaluation
-- Incl. photos
-- What worked and what didn't?
+- [ ] Incl. photos
+- [ ] What worked and what didn't?
 ## Conclusion and Future Work
-- How to improve
-- Extension work
-    - Implementing typeless voice commands with stored locations of devices
-    - Implementing specific locations with vectors from gestures (not just walls)
-    - Have commands from MQTT automatically trigger a command on Home Assistant end
-        - Send command such as light.ceiling.turn_on
-    - Pose Recognition for in the dark
-    - More advanced commands to include variables such as a brightness level to set a light to
-    - More advanced Speech To Text engine from OpenAI that supports streaming
-        - This is the biggest hinderance
-- What would you do differently?
+- [ ] How to improve
+- [ ] Extension work
+    - [ ] Implementing typeless voice commands with stored locations of devices
+    - [ ] Implementing specific locations with vectors from gestures (not just walls)
+    - [ ] Have commands from MQTT automatically trigger a command on Home Assistant end
+        - [ ] Send command such as light.ceiling.turn_on
+    - [ ] Pose Recognition for in the dark
+    - [ ] More advanced commands to include variables such as a brightness level to set a light to
+    - [ ] More advanced Speech To Text engine from OpenAI that supports streaming
+        - [ ] This is the biggest hinderance
+- [ ] What would you do differently?
 ## References
 ## Appendix
-- User manual
-    - Extensive detail on setup and running
-    - Incl. dependencies (see if i can do it myself on another device)
-- JSON commands
+- [ ] User manual
+    - [ ] Extensive detail on setup and running
+    - [ ] Incl. dependencies (see if i can do it myself on another device)
+- [ ] JSON commands
