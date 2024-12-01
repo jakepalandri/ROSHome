@@ -82,6 +82,7 @@ class ReadKinectPose(Node):
         left_gesture, right_gesture, left_distance, right_distance = self.determine_gesture(depth, rect_matrix, result_keypoint, isPerson)
         self.store_gesture(left_gesture, right_gesture, left_distance, right_distance, gesture_time)
 
+        # CUSTOMISABLE
         # UNCOMMENT THIS TO ALLOW GESTURE-ONLY COMMANDS (NO VOICE REQUIRED)
         # self.send_gesture(left_gesture, right_gesture)
 
@@ -184,21 +185,21 @@ class ReadKinectPose(Node):
         # 9. Send gesture message
         # 9a. If new gesture, reset timer, needs to be held for 2 frames
         if self.last_gesture != gesture:
-            print(f"old gesture: {self.last_gesture} new gesture: {gesture}")
+            # print(f"old gesture: {self.last_gesture} new gesture: {gesture}")
             self.frames_holding_gesture = 1
             self.last_gesture = gesture
             return
 
         # 9b. If gesture has been held for less than 2 frames, increment
         if self.frames_holding_gesture < 2:
-            print(f"frames holding gesture: {str(self.frames_holding_gesture)}")
+            # print(f"frames holding gesture: {str(self.frames_holding_gesture)}")
             self.frames_holding_gesture += 1
             return
 
         # 9c. Otherwise, send the message
         self.client.pub(topic, payload)
         self.publisher.publish(String(data=payload))
-        print(f"Sending message: {payload}")
+        self.get_logger().info(f"Sending message: {payload}")
 
     def store_gesture(self, left_gesture, right_gesture, left_distance, right_distance, gesture_time):
         # only store the last 10 seconds of gestures
@@ -231,20 +232,22 @@ class ReadKinectPose(Node):
         # new gesture is closer to 250ms since the last gesture
         if abs(gesture_time - prev["time"] - 250000000) < abs(last["time"] - prev["time"] - 250000000):
             self.gesture_history[-1] = {"time": gesture_time, "gesture": gesture}
-        # it has been more than 250ms since the last gesture this gesture is not closer to the 250ms mark
+        # it has been more than 250ms since the last gesture and this gesture is not closer to the 250ms mark
         else:
             self.gesture_history.append({"time": gesture_time, "gesture": gesture})
 
     def process_speech(self, speech_info):
         # 9. Process speech and get command
         speech_json = json.loads(speech_info.data)
-        print(json.dumps(speech_json, indent=2))
+        # print(json.dumps(speech_json, indent=2))
 
         topic = "kinect_pose"
         start_time = speech_json["start_time_ns"]
         payload = ""
         send_command = False
-        starts_with_home = False
+        # CUSTOMISABLE
+        wake_word = "home"
+        starts_with_wake_word = False
 
         # Check for wake word to respond if an invalid command is given
         # If a wake word is not given, a valid command will still work
@@ -253,8 +256,8 @@ class ReadKinectPose(Node):
         # But it will not give feedback for regular speech not intended as a command
         for sentence in speech_json["alternatives"]:
             text = sentence["text"]
-            if text.startswith("home"):
-                starts_with_home = True
+            if text.startswith(wake_word):
+                starts_with_wake_word = True
 
         # check each possible sentence option
         for sentence in speech_json["alternatives"]:
@@ -311,7 +314,7 @@ class ReadKinectPose(Node):
 
         # 10. Send command message
         if not send_command:
-            if starts_with_home:
+            if starts_with_wake_word:
                 self.respond("no_command")
             return
         

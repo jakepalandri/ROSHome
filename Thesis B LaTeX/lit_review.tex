@@ -99,7 +99,7 @@ To solve these downfalls of existing implementations, the authors took a differe
 However, there are a couple of areas that they did not explore that were within reach using the setup that they had implemented and that this thesis intends to expand upon.
 
 A limitation regarding their investigation was that the authors only used the sensors as a toggle for light emitting diodes (LEDs) with the aim of reducing unnecessary energy use.
-Furthermore, to identify people in the camera, they used You only look once (Yolo), a computer vision AI model for used object detection, classification, and segmentation, which also has a built-in ``skeletonisation'' feature, allowing you to track a person's posture and make more intelligent decisions based on a person's movements.
+Furthermore, to identify people in the camera, they used You Only Look Once (YOLO), a computer vision AI model for used object detection, classification, and segmentation, which also has a built-in ``skeletonisation'' feature, allowing you to track a person's posture and make more intelligent decisions based on a person's movements.
 These two ideas present an opportunity to fill a potential gap in the market making more intelligent decisions in the home using existing technology and real-world implementations.
 Consequently, this thesis aims to implement a system capable of executing more complex tasks such as controlling other smart devices in the house like a television or blinds with more potential states than just off and on.
 
@@ -232,20 +232,44 @@ There is also some overlap in this field with the computer vision and gesture re
 M. Oudah et al. implemented a hand gesture recognition system, similar to that of S. Desai and A. Desai, but with the aim of assisting the elderly and disabled in their daily lives by allowing them to use gestures to get support if communication is a problem for them~\cite{Ouda21}.
 With working deployments of both of these technologies in the AAL field, this shows promising signs for potential in the home automation field.
 
+\subsection{Voice Control and Multi-Modal Smart Home Automation}
+Using voice commands for controlling devices in a home is an already well explored area of research, with many existing implementations and products on the market for over a decade.
+Still, in recent years there have been many developments from individual researchers into creating custom open-source voice control systems for smart phones to control devices in the home.
+Papers from P. J. Rani et al. and J. R. Aluru et al. both discuss the implementation of mobile apps that take voice commands from the user and send them to a miniature computer, an Arduino board or Raspberry Pi respectively, to control devices in the home~\cite{Alur21,Rani17}.
+Their implementations are both very versatile and could allow for the user to control a wide range of devices in the home, simplifying home device control.
+However, both of these systems are limited to only voice commands and do not integrate with any other systems, meaning adding devices requires manual programming and setup, making it far less user-friendly and accessible to the general public.
+They also are reliant on the use of a smart phone application to record the voice commands which is not always practical for the user to have on them at all times.
+An improved implementation may have static microphones in the home that are always listening for commands, similar to the Amazon Echo or Google Home devices, so that users are not burdened by the extra step of having to retrieve their phone and open an app, at which point they could have already manually controlled the device.
+Additionally, they both require an active internet connection, which is a significant limitation for smart home devices, as discussed earlier.
+
+In 2020, E. Dutt et al. explored the prospect of multi-modal inputs for controlling a smart home~\cite{Dutt20}.
+They proposed a system that could control a smart home using both voice and gesture recognition, with the aim of making the system completely hands free, with no physical touch required, making it more accessible to people with physical disabilities.
+Their system employed IR sensors to detect a gesture or obstruction of the sensor which triggered the master switch to allow voice commands to be processed.
+Once activated, the user can then use 15 different voice commands (as specified by the users in advance) to send signals to devices to control them.
+There are several issues with this approach, including the limited functionality available and the primitive gesture detection methods.
+Only allowing 15 voice commands is a significant limitation as this restricts the the user to only a handful of actions that they can perform with their devices.
+Furthermore, the gesture detection system is incredibly primitive, only detecting an IR sensor obstruction, which essentially does not detect unique gestures at all but acts as a replacement for a wake word.
+Despite this, the idea to combine multiple inputs to control a smart home is promising and could be expanded upon to create a more intelligent system, which is one of the goals this thesis aims to achieve.
+
+N. Ganji et al., however, do integrate more complex gesture recognition into their system, using an RGB camera to detect hand gestures, with four pre-defined gestures that determine which device to control~\cite{Ganj22}.
+This allowed users to use more complex gestures to control their devices, expanding the possibilities for more robust control of devices in the home.
+This, in conjunction with voice commands, allows for a more natural interaction with the smart home.
+While this is a significant improvement over the previous implementations, it still has limitations in the number of gestures that can be recognised and the lack of integration with other systems.
+The gestures and voice commands are pre-defined so the user cannot customise them to their needs without significant programming knowledge.
+The system also requires an internet connection at all times to process the voice and gesture commands, prohibiting the system from functioning when the internet connection is lost.
+
 \section{Gaps in Literature}
 After a thorough review of existing literature in the space that is being explored by this thesis, it is clear that there has been extensive research into many of the facets of the proposed system in consideration.
 Computer vision is a widely researched field and has been applied to many different areas of smart home technology, from security to gesture recognition.
-Human action recognition and gesture recognition have both also been studied for decades.
+Human action recognition and gesture recognition have both also been studied for decades, and more recently there has been a significant amount of research into voice controls and multi-modal input recognition.
 
 Despite this, there is a significant gap in the literature when it comes to the actual integration of these technologies with smart home devices and automation.
 Most of the literature either discusses the technology in isolation or discusses implementation into smart homes on a theoretical level.
+Other papers discuss solving some of the singular problems with smart homes individually, but none cover the full scope of the problems that are faced by the industry.
 For example, there is vast research that discusses the use of computer vision for intrusion detection and security in a smart home, but the possibility of using this technology for automating tasks and controlling devices in the home is rarely considered. 
 Almost none of the papers have actually implemented the technology into a real-world smart home environment and tested the results.
 This presents a significant opportunity for this thesis to contribute to the field by providing a real-world implementation of these technologies and evaluating their performance and user experience.
-
-There is also an opportunity to dive into a new area of research by combining these technologies with behaviour prediction to create a truly intelligent smart home environment.
-Behaviour prediction and monitoring have been studied in the context of care for the elderly and disabled for ambient assisted living, but not in the context of smart home automation.
-If done correctly, combining these technologies could allow for a smart home environment that can predict a user's behaviour and automate tasks in the home based on these predictions, without the need for user input.
+Each of the critiques made in the literature review will be goals to address in this thesis, with the aim of creating a more intelligent and autonomous smart home environment that is more accessible to the general public.
 
 \section{Problem Statement}
 Smart homes today promise enhanced convenience, safety, and security through the connectivity of more and more devices and the automation of regular tasks.
@@ -258,15 +282,15 @@ Utilising local processing and sensor data, the system will enhance convenience,
 
 Moreover, with several gaps in the existing research and literature in this area, this thesis aims to be able to integrate computer vision techniques and depth sensor technology into a smart home environment, utitlising this data to assist in automation, not just home monitoring and security.
 This will provide a real-world implementation of these technologies and a live demonstration of the home's capabilities, as opposed to the theoretical implementations that are currently discussed in the recent literature.
-The implementation of behavioural prediction technology, commonly used in AAL systems, will also be explored to predict user behaviour and automate tasks in the home based on the user's regular routines.
+Of those papers with existing implementations, there will be significant expansion on the capabilities of the system, with the aim of controlling more devices and giving the user the ability to easily customise the system to their needs.
 
 Overall, this research endeavours to contribute to the evolution of smart homes by introducing innovative approaches to enhance their intelligence and autonomy, ultimately improving the quality of life for users.
 
 \section{Aims and Outcomes}
-The research objectives of this thesis include designing and implementing artificial intelligence and computer vision for movement prediction and gesture control, integrating these into existing smart home infrastructure, and evaluating the performance and user experience of the environment.
+The research objectives of this thesis include designing and implementing artificial intelligence and computer vision for movement prediction and gesture control, integrating these with concurrent voice controls and into existing smart home infrastructure, finally evaluating the performance and user experience of the environment.
 
 With entirely locally processed data, the system will be able to control devices within the home without the need for internet connectivity, enhancing convenience, safety, and security for users.
-Computer vision techniques will be used to identify users in the home and track their movements and gestures to control devices, while AI will be used to predict user behaviour and automate tasks in the home.
+Computer vision techniques will be used to identify users in the home and track their movements and gestures to identify devices, with voice commands being used to specify an action for the device to take.
 
 The anticipated outcomes of this research include advancements in smart home technology, improved user experiences, and insights into addressing the broader challenges in the field as outlined in the literature review.
 While the research focuses on addressing specific aspects of smart home functionality, certain limitations, such as device compatibility and privacy concerns, will be acknowledged and considered throughout the study.

@@ -77,15 +77,21 @@ check canva or notes
 ## Introduction
 ## Literature Review
 - [x] Copy + paste literature review from Thesis A
-- [ ] Update existing literature review
-    -  [ ] Voice commands, etc.
+- [x] Update existing literature review
+    -  [x] Voice commands, etc.
 ## Methodology
-- [ ] Talk about ROS and how devices interface, speech tools, models etc.
-- [ ] Tech Stack
-- [ ] Physical Setup Diagram
+<!-- https://ieeexplore-ieee-org.wwwproxy1.library.unsw.edu.au/document/9835832 -->
+- [x] Talk about ROS and how devices interface, speech tools, models etc. 
+- [x] Code Logic
+- [x] Tech Stack
+- [x] Physical Setup Diagram
+- [x] Physical components individual descriptions
+- [x] Software components individual descriptions
 ## Evaluation
+- [ ] Stats
 - [ ] Incl. photos
 - [ ] What worked and what didn't?
+- [ ] Problems Solved
 ## Conclusion and Future Work
 - [ ] How to improve
 - [ ] Extension work
