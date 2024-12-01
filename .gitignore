@@ -11,17 +11,17 @@ Thesis A LaTex/*.log
 Thesis A LaTex/*.lot
 Thesis A LaTex/*.toc
 Thesis A LaTex/*.out
-Thesis B LaTex/*.gz
-Thesis B LaTex/*.aux
-Thesis B LaTex/*.bbl
-Thesis B LaTex/*.blg
-Thesis B LaTex/*.fdb_latexmk
-Thesis B LaTex/*.fls
-Thesis B LaTex/*.lof
-Thesis B LaTex/*.log
-Thesis B LaTex/*.lot
-Thesis B LaTex/*.toc
-Thesis B LaTex/*.out
+Thesis C LaTex/*.gz
+Thesis C LaTex/*.aux
+Thesis C LaTex/*.bbl
+Thesis C LaTex/*.blg
+Thesis C LaTex/*.fdb_latexmk
+Thesis C LaTex/*.fls
+Thesis C LaTex/*.lof
+Thesis C LaTex/*.log
+Thesis C LaTex/*.lot
+Thesis C LaTex/*.toc
+Thesis C LaTex/*.out
 .vscode
 ros2_ws/build
 ros2_ws/install
