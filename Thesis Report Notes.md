@@ -93,17 +93,17 @@ check canva or notes
 - [x] Incl. photos
 - [x] What worked and what didn't?
 ## Conclusion and Future Work
-- [ ] How to improve
-- [ ] Extension work
-    - [ ] Implementing typeless voice commands with stored locations of devices
-    - [ ] Implementing specific locations with vectors from gestures (not just walls)
-    - [ ] Have commands from MQTT automatically trigger a command on Home Assistant end
-        - [ ] Send command such as light.ceiling.turn_on
-    - [ ] Pose Recognition for in the dark
-    - [ ] More advanced commands to include variables such as a brightness level to set a light to
-    - [ ] More advanced Speech To Text engine from OpenAI that supports streaming
-        - [ ] This is the biggest hinderance
-- [ ] What would you do differently?
+- [x] How to improve
+- [x] Extension work
+    - [x] Implementing typeless voice commands with stored locations of devices
+    - [x] Implementing specific locations with vectors from gestures (not just walls)
+    - [x] Have commands from MQTT automatically trigger a command on Home Assistant end
+        - [x] Send command such as light.ceiling.turn_on
+    - [x] Pose Recognition for in the dark
+    - [x] More advanced commands to include variables such as a brightness level to set a light to
+    - [x] More advanced Speech To Text engine from OpenAI that supports streaming
+        - [x] This is the biggest hinderance
+- [x] What would you do differently?
 ## References
 ## Appendix
 - [x] User manual
