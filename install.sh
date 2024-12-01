@@ -230,8 +230,6 @@ sudo add-apt-repository universe
 sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
 
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
-
-# CHOOSE ONE - DEBIAN - THIS
 sudo apt update
 sudo apt -y upgrade # this may need a second attempt if it errors
 sudo apt -y install ros-foxy-desktop python3-argcomplete
@@ -249,10 +247,10 @@ ros2 topic list
 # /parameter_events
 # /rosout
 
-# ROS1 BRIDGE INSTALLATION - DEBIAN - YEP
+# ROS1 BRIDGE INSTALLATION
 sudo apt -y install ros-foxy-ros1-bridge
 
-# THIS IS SPECIFIC TO MY SETUP WITH THE ROSHome FOLDER IN ~ 
+# THIS IS SPECIFIC TO A SETUP WITH THE ROSHome FOLDER IN ~ 
 echo "alias srws='source ~/ROSHome/ros2_ws/install/setup.bash'" >> ~/.bashrc
 
 # install python modules and other required modules for the code to run
@@ -273,6 +271,7 @@ sudo apt -y install nodejs npm
 sudo npm install -g live-server
 
 # download model from vosk
+# CUSTOMISABLE: change the model to one that your computer is capable of running
 # alternative models available at https://alphacephei.com/vosk/models
 cd ~/ROSHome/ros2_ws/assets && mkdir models && cd models
 wget -q --show-progress https://alphacephei.com/vosk/models/vosk-model-en-us-0.42-gigaspeech.zip

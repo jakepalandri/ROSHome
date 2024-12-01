@@ -29,14 +29,11 @@ cd ~/ROSHome/ros2_ws
 colcon build --packages-select speech_to_text
 ros2 run speech_to_text listener
 
-# TERMINAL 6 (Mosquitto Broker): 
-mosquitto_sub -v -h localhost -p 1883 -t '#'
-
-# TERMINAL 7 (Voice Command Web Server):
+# TERMINAL 6 (Voice Command Web Server):
 cd ~/ROSHome/ros2_ws/web_app/backend
 python3 web_server.py
 
-# TERMINAL 8 (Voice Command Web App):
+# TERMINAL 7 (Voice Command Web App):
 cd ~/ROSHome/ros2_ws/web_app/frontend
 tsc
 live-server

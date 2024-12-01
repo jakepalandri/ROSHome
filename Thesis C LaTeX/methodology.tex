@@ -11,7 +11,7 @@ This led to the initial simplified technology stack as shown in Figure~\ref{fig:
 \begin{figure}[!htb]
     \caption{Simplified Technology Stack}
     \centering
-    \includegraphics[width=\textwidth]{Simplified Tech Stack.png}
+    \includegraphics[width=0.88\textwidth]{Simplified Tech Stack.png}
     \label{fig:simple_tech_stack}
 \end{figure}
 
@@ -70,6 +70,12 @@ In theory, other depth cameras could be suitable for alternative deployments but
 The Raspberry Pi 3, was selected for multiple reasons.
 Home Assistant is relatively lightweight so the choice of hardware was not limited by processing power, therefore a miniature computer such as a Raspberry Pi was appealling due to it's low cost, small footprint and ease of use with Home Assistant.
 The Pi 3 specifically was chosen as it was available on-hand, though other single-board computers capable of running Home Assistant would also be fitting choices.
+
+\begin{figure}[!htb]
+    \caption{Home Assistant Interface}
+    \makebox[\textwidth][c]{\includegraphics[width=0.9\pdfpagewidth]{Home Assistant.png}}
+    \label{fig:home_assistant}
+\end{figure}
 
 The Sonoff Zigbee dongle, which is attached to the Raspberry Pi, along with the Ikea light bulbs and IR emitter were primarily chosen for their low price points.
 Zigbee is an open source communication standards with lower fees for accreditation than other competing standards such as Z-Wave, therefore their products tend to be cheaper than their Z-Wave counterparts.
@@ -146,17 +152,23 @@ To integrate this with the current system, rclpy is used to process and register
 A Raspberry Pi 3, is used to run the Home Assistant server along with an MQTT broker, and zigbee2mqtt, a service to bridge mqtt signals directly to zigbee smart devices.
 From there, Home Assistant is able to control the smart devices over the zigbee network through manual control from the user or automations.
 
-Using rclpy, there are two ROS nodes created to process the speech and the user's voice commands.
+Using rclpy, there are two ROS nodes created to process the speech and the user's gestures.
 The STT node takes audio directly from the computer's built-in microphone and streams it to Vosk to process the speech.
-The result of the vosk model is then published to a topic on the ROS network.
+The result of the Vosk model is then published to a topic on the ROS network.
 The second node subscribes to both the STT topic published by the first node, and the topics created by the Kinect sensors through the layers of translation from the camera to ROS 2.
 This then processes the voice commands at the same time as the gestures and will send the MQTT message to trigger devices.
 
 Finally, there is a web app that allows users to customise which voice commands are available to control their devices.
-This is available on the network through a local IP address, or within Home Assistant.
+This is available on the network through a local IP address, or within Home Assistant as shown in Figure~\ref{fig:command_interface}.
 The web app accesses a JavaScript Object Notation (JSON) file on the system that contains all device types available in the home and their associated commands.
 From here the user can add, modify or remove commands and device types entirely depending on the needs of their home.
 This modifies the JSON file on the system, which in turn triggers an update in the ROS node to ensure that only valid commands are being checked for.
+
+\begin{figure}[!htb]
+    \caption{Command Web Interface}
+    \makebox[\textwidth][c]{\includegraphics[width=0.9\pdfpagewidth]{Command Web Interface.png}}
+    \label{fig:command_interface}
+\end{figure}
 
 \section{Code Logic}
 
@@ -183,13 +195,13 @@ However, if regular speech is picked up not intended to control a device, then t
 Following this, each of the alternative interpretations from Vosk are checked against the JSON object containing all the valid device types and commands.
 These are checked against a regex string in order to allow users to speak in a more natural manner and still trigger the correct device with other superfluous words in the command.
 
-The regex string for matching a command for a single device is
+The regex string for matching a command for a single device is:
 \begin{center}
     \texttt{rf".*\textbackslash b\{command\}\textbackslash b.*\textbackslash bthat\textbackslash b.*\textbackslash b\{device\}\textbackslash b.*"}
 \end{center}
 For the case where the command is ``turn on'' and the device is a ``light,'' this gives users the ability to say the simple command ``turn on that light'', or speak more naturally and say ``could you turn on that light over there for me please.''
 
-The regex string for matching a command for a all devices of a single type is
+The regex string for matching a command for a all devices of a single type is:
 \begin{center}
     \texttt{rf".*\textbackslash b\{command\}\textbackslash b.*\textbackslash b(all|every)\textbackslash b.*\textbackslash b\{device\}s?\textbackslash b.*"}
 \end{center}
@@ -197,7 +209,7 @@ This gives users the option to say the commands ``turn on all lights,'' or ``tur
 
 Once a command is matched, it is added to a list, and once each of the device types and commands is checked against the command with the latest match is selected.
 This is done so that a user can correct themselves mid-sentence and still trigger their intended command.
-For example, a user might say ``can you turn on that light, I mean that fan''.
+For example, a user might say ``can you turn on that light, I mean that fan.''
 This would trigger the automation to turn on the fan.
 Once a command is recognised, the timestamp at which the word ``that'' is said is compared to the history of gestures and the gesture with the closest timestamp to the keyword is selected.
 

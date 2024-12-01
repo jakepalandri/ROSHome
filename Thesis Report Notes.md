@@ -88,10 +88,10 @@ check canva or notes
 - [x] Physical components individual descriptions
 - [x] Software components individual descriptions
 ## Evaluation
-- [ ] Stats
-- [ ] Incl. photos
-- [ ] What worked and what didn't?
-- [ ] Problems Solved
+- [x] Problems Solved
+- [x] Stats
+- [x] Incl. photos
+- [x] What worked and what didn't?
 ## Conclusion and Future Work
 - [ ] How to improve
 - [ ] Extension work
@@ -106,7 +106,7 @@ check canva or notes
 - [ ] What would you do differently?
 ## References
 ## Appendix
-- [ ] User manual
-    - [ ] Extensive detail on setup and running
-    - [ ] Incl. dependencies (see if i can do it myself on another device)
-- [ ] JSON commands
+- [x] User manual
+    - [x] Extensive detail on setup and running
+    - [x] Incl. dependencies (see if i can do it myself on another device)
+- [x] JSON commands

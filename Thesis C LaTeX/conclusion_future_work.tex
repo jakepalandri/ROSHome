@@ -1,13 +1,34 @@
 \chapter{Conclusion and Future Work}\label{ch:conclusion_future_work}
 
-This report has covered the evolution of smart homes since the 20th century, and how it has reached the current state of the art in smart home technology, as well as existing literature exploring the potential implementations of computer vision technology and human action recognition in future smart homes.
-Behaviour monitoring in ambient assisted living environments has also been considered for use as an advanced technology with potential applications in home automation.
-The gaps in the literature show that there is a vast amount of research into each of these fields but very little in actual application and deployment in controlling IoT devices in the home.
-
-A detailed plan for Thesis~B predicts an eight-week timeline for the completion of the project, with a focus on the implementation of the CV gesture recognition system and front-end for manual device control.
-
-The progress during Thesis~A so far, from the primitive integration of the Kinect depth sensor with ROS 2, has shown that the proposed system is viable and can be implemented over the course of the next term.
-
 \section{Future Work}
-The future work will be continued as outlined in Chapter~\ref{ch:plan}.
-At the conclusion of this thesis, further research can be undertaken to explore multi-modal inputs for gesture and voice recognition in conjunction to allow for more natural interaction with the smart home.
+At the conclusion of this thesis, there are several areas that require further research and development to improve the system's accuracy and functionality.
+The following is a list of potential future work that could be undertaken to improve the system:
+
+Firstly, implementing typeless voice commands would allow users to give the command `turn on that' with a gesture, without specifying a device.
+This would only be possible for the case when the direction they point has one device with that matching command.
+This would require the system to store the locations of devices in the room and match the direction of the gesture to the location of the device as the command is given, not on the Home Assistant end.
+
+Next, implementing specific locations with vectors from gestures would allow users to point to a specific location in the room, as opposed to the four walls, ceiling and floor that are currently possible, to give more robust control over devices.
+This would also require the system to store the locations of devices in the room in order to accurately identify the selected device, and would allow users to have more flexibility in the positioning of their devices.
+
+When the structure for the MQTT commands was chosen to be \texttt{\{"kinect\_pose": "direction\_device.command"\}}, it was chosen to be as close as possible to the structure of existing Home Assistant commands.
+In future, it would save users time during setup if the system could automatically trigger a command on the Home Assistant end when a command is received from MQTT.
+This would mean sending a command such as light.ceiling.turn\_on and having the system automatically trigger the corresponding action without requiring the user to set up an automation in Home Assistant.
+
+The system currently uses an RGB image for pose estimation, which would not work at night with the lights off.
+Therefore users are not able to control their devices in the dark.
+The Kinect has an infrared sensor that could potentially be used to detect poses in the dark, by detecting the heat signature of the user and translating this into an RGB image.
+
+Another quality of life feature that could be implemented, is the ability to have more advanced commands to include variables such as brightness levels or volume.
+This would allow a user to have more granular control over their devices, with a command such as `turn on that light to 50\%'.
+
+Finally, the most significant improvement that could be made to the system would be to implement a more advanced Speech To Text engine that supports streaming.
+There has been a significant amount of research into this area, and it is likely that a more advanced open source STT engine would be able to improve the accuracy of the system significantly.
+
+\section{Conclusion}
+
+This thesis has successfully developed a system that uses computer vision techniques to recognise gestures, and speech recognition tools for voice commands, to control any conceivable smart device in a home.
+Many of the challenges outlined in the literature review with existing smart homes and the current literature were addressed in the development of this system, including interoperability between devices, the requirement for internet connectivity, and the need for a more intuitive and accessible interface for users without technical expertise.
+
+The results of the evaluation concluded that although the system was incapable of recognising voice commands with a high degree of accuracy, it was able to recognise gestures nearly flawlessly.
+User feedback indicated that the system was easy to use and intuitive, and with a more accurate STT engine, the system could be a viable alternative to traditional smart home interfaces.
