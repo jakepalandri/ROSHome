@@ -3,6 +3,7 @@ from ultralytics import YOLO
 from .MqttClient import MqttClient
 import torch
 import math
+import string
 import numpy as np
 import rclpy
 import json
@@ -61,6 +62,9 @@ class ReadKinectPose(Node):
         self.client = MqttClient()
         self.frames_holding_gesture = 0
         self.last_gesture = ""
+        self.last_command_command = ""
+        self.last_command_device  = ""
+        self.last_command_span = 0
 
         self.gesture_history = []
         self.load_commands()
@@ -243,81 +247,68 @@ class ReadKinectPose(Node):
 
         topic = "kinect_pose"
         start_time = speech_json["start_time_ns"]
+        time_span = speech_json["time_span"]
         payload = ""
-        send_command = False
-        # CUSTOMISABLE
-        wake_word = "home"
-        starts_with_wake_word = False
 
-        # Check for wake word to respond if an invalid command is given
-        # If a wake word is not given, a valid command will still work
-        # However, if an invalid command is given, then there will be no feedback
-        # This is to allow people to use commands even if they forget the wake word
-        # But it will not give feedback for regular speech not intended as a command
-        for sentence in speech_json["alternatives"]:
-            text = sentence["text"]
-            if text.startswith(wake_word):
-                starts_with_wake_word = True
+        text = speech_json["text"].translate(str.maketrans('', '', string.punctuation)).lower().strip()
+        possible_matches = []
+        # check each of the possible device/command combinations to see if a valid command format is matched
+        for device in self.commands.keys():
+            for command in self.commands[device]:
+                # Regex format:     *any speech* + [COMMAND] + *any speech* + "THAT" + *any speech* + [DEVICE] + *any speech*
+                # Simple example:   "home, TURN ON THAT LIGHT"
+                # Complex example:  "home, could you please TURN ON the power to THAT big LIGHT over there for me, thanks"
+                regex = rf".*\b{command}\b.*\bthat\b.*\b{device}\b.*"
 
-        # check each possible sentence option
-        for sentence in speech_json["alternatives"]:
-            text = sentence["text"]
-            possible_matches = []
+                # Regex format:     *any speech* + [COMMAND] + *any speech* + "ALL/EVERY" + *any speech* + [DEVICE](s) + *any speech*
+                # Simple example:   "home, TURN OFF EVERY LIGHT"
+                # Simple example:   "home, TURN OFF ALL LIGHTs"
+                # Complex example:  "home, could you please TURN OFF the power to EVERY single LIGHT for me"
+                # Complex example:  "home, could you please TURN OFF the power to ALL of those LIGHTs for me"
+                regex_all = rf".*\b{command}\b.*\b(all|every)\b.*{device}s?\b.*"
+                # Check for ALL/EVERY match first
+                # If a user uses ALL/EVERY keyword, it should always trigger all devices
+                if re.match(regex_all, text):
+                    possible_matches.append({
+                        "command": command,
+                        "device": device,
+                        "all": True,
+                        "time": self.word_time(device, speech_json),
+                        "sentence": speech_json
+                    })
+                # If not, check for a single device command match
+                elif re.match(regex, text):
+                    possible_matches.append({
+                        "command": command,
+                        "device": device,
+                        "all": False,
+                        "time": self.word_time(device, speech_json),
+                        "sentence": speech_json
+                    })
 
-            # check each of the possible device/command combinations to see if a valid command format is matched
-            for device in self.commands.keys():
-                for command in self.commands[device]:
-                    # Regex format:     *any speech* + [COMMAND] + *any speech* + "THAT" + *any speech* + [DEVICE] + *any speech*
-                    # Simple example:   "home, TURN ON THAT LIGHT"
-                    # Complex example:  "home, could you please TURN ON the power to THAT big LIGHT over there for me, thanks"
-                    regex = rf".*\b{command}\b.*\bthat\b.*\b{device}\b.*"
-
-                    # Regex format:     *any speech* + [COMMAND] + *any speech* + "ALL/EVERY" + *any speech* + [DEVICE](s) + *any speech*
-                    # Simple example:   "home, TURN OFF EVERY LIGHT"
-                    # Simple example:   "home, TURN OFF ALL LIGHTs"
-                    # Complex example:  "home, could you please TURN OFF the power to EVERY single LIGHT for me"
-                    # Complex example:  "home, could you please TURN OFF the power to ALL of those LIGHTs for me"
-                    regex_all = rf".*\b{command}\b.*\b(all|every)\b.*{device}s?\b.*"
-                    
-                    # Check for ALL/EVERY match first
-                    # If a user uses ALL/EVERY keyword, it should always trigger all devices
-                    if re.match(regex_all, text):
-                        possible_matches.append({
-                            "command": command,
-                            "device": device,
-                            "all": True,
-                            "time": self.word_time(device, sentence),
-                            "sentence": sentence
-                        })
-                    # If not, check for a single device command match
-                    elif re.match(regex, text):
-                        possible_matches.append({
-                            "command": command,
-                            "device": device,
-                            "all": False,
-                            "time": self.word_time(device, sentence),
-                            "sentence": sentence
-                        })
-            
-            if len(possible_matches) == 0:
-                continue
-
-            # Select the command that has the latest matching device keyword
-            # This is so that if a user corrects themselves mid-sentence, it selects the correct command
-            # Example: "Home, turn on that light, I mean, TV"
-            # This will turn on a TV, not a light
-            possible_matches.sort(key=lambda x: x["time"], reverse=True)
-            closest_match = possible_matches[0]
-            send_command = True
-            payload = self.get_command(closest_match, start_time)
-            break
-
-        # 10. Send command message
-        if not send_command:
-            if starts_with_wake_word:
-                self.respond("no_command")
+        if len(possible_matches) == 0:
             return
-        
+        # Select the command that has the latest matching device keyword
+        # This is so that if a user corrects themselves mid-sentence, it selects the correct command
+        # Example: "Home, turn on that light, I mean, TV"
+        # This will turn on a TV, not a light
+        possible_matches.sort(key=lambda x: x["time"], reverse=True)
+        closest_match = possible_matches[0]
+
+        # if the same command is sent twice in a row within 5 seconds (due to two 5 second clips being added together), ignore the second command
+        if (closest_match["device"]  == self.last_command_device  and
+            closest_match["command"] == self.last_command_command and
+            self.last_command_span == 5 and
+            time_span == 10):
+            self.last_command_span = 0
+            self.last_command_command = closest_match["command"]
+            self.last_command_device  = closest_match["device" ] 
+            return
+
+        payload = self.get_command(closest_match, start_time)
+        self.last_command_command = closest_match["command"]
+        self.last_command_device  = closest_match["device" ]
+        self.last_command_span = time_span
         self.client.pub(topic, payload)
         self.publisher.publish(String(data=payload))
         self.get_logger().info(f"Sending message: {payload}")
@@ -349,13 +340,18 @@ class ReadKinectPose(Node):
         return f'{{"command": "{closest_gesture}_{closest_match["device"]}.{closest_match["command"]}"}}'
 
 
-    def word_time(self, match_word, sentence, start_time = 0):
+    def word_time(self, word, sentence, start_time = 0):
         word_relative_time = 0
-        for word in sentence["result"]:
-            if word["word"] == match_word:
+        for sentence_word in sentence["segments"][0]["words"]:
+            bare_word = sentence_word["word"].translate(str.maketrans('', '', string.punctuation)).lower().strip()
+            if bare_word == word:
                 # add half a second to account for processing delay
-                # 0.5s chosen based on preliminary testing
-                word_relative_time = (word["start"] + 0.5) * 10 ** 9
+                # 3s chosen based on preliminary testing
+                # THIS IS UNRELIABLE. DELAY IS NON-DETERMINISTIC
+                word_relative_time = (sentence_word["start"] - 3) * 10 ** 9
+        
+        if word_relative_time == 0:
+            return math.inf
 
         return start_time + word_relative_time
 
