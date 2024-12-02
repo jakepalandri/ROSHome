@@ -1,0 +1,80 @@
+\chapter{Appendix}\label{ch:appendix}
+
+\section{User Manual}
+\subsection{Setup Guide}
+To set up your machine to run this system, you must first install Ubuntu 20.04 on your machine.
+During installation, the default settings can be followed, and only a ``minimal installation'' is required when prompted.
+There is no need to check either of the boxes ``Download updates while installing Ubuntu,'' or ``Install third-party software for graphics and Wi-Fi hardware and additional media formats.''
+Upon restart, if you are prompted to update to Ubuntu 22.04, decline the upgrade.
+
+Once Ubuntu is installed, you can then follow the install guide in the file \texttt{install.sh} of the GitHub repository (repo) found at \url{https://github.com/jakepalandri/ROSHome}.
+These commands in the bash file must not be run as a bash script as it will not succeed.
+They must be executed line by line.
+Due to \LaTeX document formatting, the instructions cannot be reliably included in this document, however the bash script can be found \href{https://github.com/jakepalandri/ROSHome/blob/master/install.sh}{here}.
+
+This includes all of the instructions on how to install based on the setup of the system used in development, however, depending on the exact machine used, your requirements may differ.
+For example, CUDA drivers are included in the installation script, however these are only applicable to computers with an Nvidia graphics card.
+The core steps that apply to all users are:
+
+\begin{itemize}
+    \item Install Git and clone the repo
+    \item Install ROS 1 and configure the environment
+    \item Install graphics drivers for your respective graphics card
+    \item Install Libfreenect2
+    \item Install IAI's Kinect2 Bridge for OpenCV 4
+    \item Install ROS 2
+    \item Install ROS Bridge
+    \item Install modules required to run the code
+    \item Download an STT model from Vosk
+    \item Restart your computer
+    \item Set up physical hardware according to Figure~\ref{fig:physical_setup_diagram}
+    \item Set up your selected smart devices within Home Assistant and their corresponding automations 
+\end{itemize}
+
+For your Home Assistant installation, you must first set up any required devices in the web app.
+Once this is completed, you will need to set up automations for each device that you wish to control and for each command that they should respond to.
+The structure of the MQTT messages that are sent to Home Assistant are\\
+\texttt{\{"kinect\_pose": "direction\_device.command"\}}\\
+For example, the voice command ``turn on that light'' with a gesture to the ceiling would be sent as\\
+\texttt{\{"kinect\_pose": "ceiling\_light.turn\_on"\}}\\
+You must create an automation in Home Assistant that listens for this message on MQTT and triggers the corresponding action.
+
+\subsection{Execution Guide}
+Once your system is set up it is time to run the code, but first there are a few variables that are specific to a user's needs that could require some modification.
+Each of these is marked with a comment in the repository as ``CUSTOMISABLE''.
+The elements that can be customised are as follows.
+
+The dimensions of the room are defined as a bounding box in \texttt{kinect\_pose.py}.
+These should be modified to match the dimensions of the room, with respect to the position of the Kinect.
+
+There is a function remaining from Thesis B called \texttt{send\_gesture()} which sends gesture commands to Home Assistant without a voice command.
+This can be uncommented to enable this functionality.
+
+The threshold distances for a users wrist from their hip and shoulder are defined in \texttt{kinect\_pose.py}.
+These may be modified to adjust the sensitivity of the system.
+
+Finally, in \texttt{kinect\_pose.py}, the variable \texttt{wake\_word} can be modified to change the wake word that the system listens for.
+By default, this is set to ``home''.
+
+In MQTTClient.py, the IP address of the MQTT broker must be set to the IP address of the Home Assistant server.
+This should be set to a static IP address in your router settings to ensure the system works reliably, and then the IP address should be set correspondingly in the code.
+
+If you did not install the repository into the home directory, ~, then the path to the Vosk STT model must be updated in \texttt{speech\_to\_text.py}.
+
+In \texttt{web\_server.py}, the port that the web server runs on can be modified as required, and this should also be modified in the web app's TS code to match, in main.ts.
+Additionally, in main.ts, the IP address of the web server must be set to the IP address of the machine that is running all of the code.
+This should also be set to a static IP address in your router settings.
+
+Once these modifications have been made, the system can be run by executing the commands as outlined in \texttt{ros\_instructions.sh}.
+There are eight separate terminal windows that must be opened to run the system.
+These will run the following services:
+
+\begin{itemize}
+    \item ROS 1 Core
+    \item Kinect2 Bridge
+    \item ROS Bridge
+    \item Kinect Gesture and Voice Command Recognition
+    \item Speech to Text
+    \item Voice Command Web Server, and
+    \item Voice Command Web App
+\end{itemize}
