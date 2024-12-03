@@ -1,27 +1,27 @@
 kinect_cal_data/*.png
 *.log
-Thesis A LaTex/*.gz
-Thesis A LaTex/*.aux
-Thesis A LaTex/*.bbl
-Thesis A LaTex/*.blg
-Thesis A LaTex/*.fdb_latexmk
-Thesis A LaTex/*.fls
-Thesis A LaTex/*.lof
-Thesis A LaTex/*.log
-Thesis A LaTex/*.lot
-Thesis A LaTex/*.toc
-Thesis A LaTex/*.out
-Thesis C LaTex/*.gz
-Thesis C LaTex/*.aux
-Thesis C LaTex/*.bbl
-Thesis C LaTex/*.blg
-Thesis C LaTex/*.fdb_latexmk
-Thesis C LaTex/*.fls
-Thesis C LaTex/*.lof
-Thesis C LaTex/*.log
-Thesis C LaTex/*.lot
-Thesis C LaTex/*.toc
-Thesis C LaTex/*.out
+Notes and Docs/Thesis A LaTex/*.gz
+Notes and Docs/Thesis A LaTex/*.aux
+Notes and Docs/Thesis A LaTex/*.bbl
+Notes and Docs/Thesis A LaTex/*.blg
+Notes and Docs/Thesis A LaTex/*.fdb_latexmk
+Notes and Docs/Thesis A LaTex/*.fls
+Notes and Docs/Thesis A LaTex/*.lof
+Notes and Docs/Thesis A LaTex/*.log
+Notes and Docs/Thesis A LaTex/*.lot
+Notes and Docs/Thesis A LaTex/*.toc
+Notes and Docs/Thesis A LaTex/*.out
+Notes and Docs/Thesis C LaTex/*.gz
+Notes and Docs/Thesis C LaTex/*.aux
+Notes and Docs/Thesis C LaTex/*.bbl
+Notes and Docs/Thesis C LaTex/*.blg
+Notes and Docs/Thesis C LaTex/*.fdb_latexmk
+Notes and Docs/Thesis C LaTex/*.fls
+Notes and Docs/Thesis C LaTex/*.lof
+Notes and Docs/Thesis C LaTex/*.log
+Notes and Docs/Thesis C LaTex/*.lot
+Notes and Docs/Thesis C LaTex/*.toc
+Notes and Docs/Thesis C LaTex/*.out
 .vscode
 ros2_ws/build
 ros2_ws/install

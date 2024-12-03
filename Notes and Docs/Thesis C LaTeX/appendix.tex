@@ -10,7 +10,7 @@ Upon restart, if you are prompted to update to Ubuntu 22.04, decline the upgrade
 Once Ubuntu is installed, you can then follow the install guide in the file \texttt{install.sh} of the GitHub repository (repo) found at \url{https://github.com/jakepalandri/ROSHome}.
 These commands in the bash file must not be run as a bash script as it will not succeed.
 They must be executed line by line.
-Due to \LaTeX document formatting, the instructions cannot be reliably included in this document, however the bash script can be found \href{https://github.com/jakepalandri/ROSHome/blob/master/install.sh}{here}.
+Due to \LaTeX document formatting, the instructions cannot be reliably included in this document, however the bash script can be found \href{https://github.com/jakepalandri/ROSHome/blob/master/install.sh}{\underline{here}}.
 
 This includes all of the instructions on how to install based on the setup of the system used in development, however, depending on the exact machine used, your requirements may differ.
 For example, CUDA drivers are included in the installation script, however these are only applicable to computers with an Nvidia graphics card.
@@ -41,7 +41,7 @@ You must create an automation in Home Assistant that listens for this message on
 
 \subsection{Execution Guide}
 Once your system is set up it is time to run the code, but first there are a few variables that are specific to a user's needs that could require some modification.
-Each of these is marked with a comment in the repository as ``CUSTOMISABLE''.
+Each of these is marked with a comment in the repository as \texttt{CUSTOMISABLE}.
 The elements that can be customised are as follows.
 
 The dimensions of the room are defined as a bounding box in \texttt{kinect\_pose.py}.
@@ -56,17 +56,17 @@ These may be modified to adjust the sensitivity of the system.
 Finally, in \texttt{kinect\_pose.py}, the variable \texttt{wake\_word} can be modified to change the wake word that the system listens for.
 By default, this is set to ``home''.
 
-In MQTTClient.py, the IP address of the MQTT broker must be set to the IP address of the Home Assistant server.
+In \texttt{MQTTClient.py}, the IP address of the MQTT broker must be set to the IP address of the Home Assistant server.
 This should be set to a static IP address in your router settings to ensure the system works reliably, and then the IP address should be set correspondingly in the code.
 
-If you did not install the repository into the home directory, ~, then the path to the Vosk STT model must be updated in \texttt{speech\_to\_text.py}.
+If you did not install the repository into the home directory, \texttt{\customtilde}, then the path to the Vosk STT model must be updated in \texttt{speech\_to\_text.py}.
 
 In \texttt{web\_server.py}, the port that the web server runs on can be modified as required, and this should also be modified in the web app's TS code to match, in main.ts.
 Additionally, in main.ts, the IP address of the web server must be set to the IP address of the machine that is running all of the code.
 This should also be set to a static IP address in your router settings.
 
 Once these modifications have been made, the system can be run by executing the commands as outlined in \texttt{ros\_instructions.sh}.
-There are eight separate terminal windows that must be opened to run the system.
+There are seven separate terminal windows that must be opened to run the system.
 These will run the following services:
 
 \begin{itemize}

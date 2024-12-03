@@ -23,7 +23,7 @@ A very specific environment setup is required in order for these systems to func
 
 \subsubsection{Thesis B}
 Following this, during the complete development of the system in Thesis B, the technology stack was modified slightly in order to accomodate a more robust and customisable system for managing smart devices in the home as in Figure~\ref{fig:tech_stack_thesis_b}.
-Using the open source home automation platform Home Assistant allows for far more versatility in automation abilities, choices for devices and provides it's own user interface, eliminating the need for a separate custom TS frontend.
+Using the open source home automation platform Home Assistant allows for far more versatility in automation abilities, choices for devices and provides it's own user interface as shown in Figure~\ref{fig:home_assistant}, eliminating the need for a separate custom TS frontend.
 
 \subsubsection{Thesis C}
 During Thesis C, one of the stretch goals that was set, implementing voice commands and multi-modal device control, was developed.
@@ -46,6 +46,12 @@ The final technology stack for this thesis as it is currently implemented is as 
     \caption{Thesis C Final Technology Stack}
     \makebox[\textwidth][c]{\includegraphics[width=\textheight,angle=90]{Tech Stack Thesis C.png}}
     \label{fig:tech_stack_thesis_c}
+\end{figure}
+
+\begin{figure}[!htb]
+    \caption{Home Assistant Interface}
+    \makebox[\textwidth][c]{\includegraphics[width=\textwidth]{Home Assistant.png}}
+    \label{fig:home_assistant}
 \end{figure}
 
 \section{Hardware Components}
@@ -71,12 +77,6 @@ The Raspberry Pi 3, was selected for multiple reasons.
 Home Assistant is relatively lightweight so the choice of hardware was not limited by processing power, therefore a miniature computer such as a Raspberry Pi was appealling due to it's low cost, small footprint and ease of use with Home Assistant.
 The Pi 3 specifically was chosen as it was available on-hand, though other single-board computers capable of running Home Assistant would also be fitting choices.
 
-\begin{figure}[!htb]
-    \caption{Home Assistant Interface}
-    \makebox[\textwidth][c]{\includegraphics[width=0.9\pdfpagewidth]{Home Assistant.png}}
-    \label{fig:home_assistant}
-\end{figure}
-
 The Sonoff Zigbee dongle, which is attached to the Raspberry Pi, along with the Ikea light bulbs and IR emitter were primarily chosen for their low price points.
 Zigbee is an open source communication standards with lower fees for accreditation than other competing standards such as Z-Wave, therefore their products tend to be cheaper than their Z-Wave counterparts.
 The dongle is required in order to communicate between Home Assistant and the smart devices.
@@ -87,7 +87,7 @@ The components should be set up as shown in Figure~\ref{fig:physical_setup_diagr
 
 \begin{figure}[H]
     \caption{Physical Setup Diagram}
-    \makebox[\textwidth][c]{\includegraphics[height=0.6\textheight,angle=0]{Physical Setup Diagram.png}}
+    \makebox[\textwidth][c]{\includegraphics[height=0.5\textheight]{Physical Setup Diagram.png}}
     \label{fig:physical_setup_diagram}
 \end{figure}
 
@@ -166,7 +166,7 @@ This modifies the JSON file on the system, which in turn triggers an update in t
 
 \begin{figure}[!htb]
     \caption{Command Web Interface}
-    \makebox[\textwidth][c]{\includegraphics[width=0.9\pdfpagewidth]{Command Web Interface.png}}
+    \makebox[\textwidth][c]{\includegraphics[width=\textwidth]{Command Web Interface.png}}
     \label{fig:command_interface}
 \end{figure}
 
